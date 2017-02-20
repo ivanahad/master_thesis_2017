@@ -1,9 +1,18 @@
-var http = require("http");
+var dgram = require('dgram')
+var server = dgram.createSocket('udp4')
 
-http.createServer(function (request, response){
-  response.writeHead(200, {'Content-Type': 'text/plain'});
+server.on('error', (err) => {
+  console.log(`server error:\n${err.stack}`);
+  server.close();
+});
 
-  response.end('Hello World\n');
-}).listen(8081);
+server.on('message', (msg, rinfo) => {
+  console.log(`server got: ${msg} from ${rinfo.address}:${rinfo.port}`);
+});
 
-console.log('Server running at http://127.0.0.1:8081/');
+server.on('listening', () => {
+  var address = server.address();
+  console.log(`server listening ${address.address}:${address.port}`);
+});
+
+server.bind(41234, '127.0.0.1');
