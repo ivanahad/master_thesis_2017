@@ -88,3 +88,34 @@ function onListening() {
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+
+/*
+ *  UPD server
+ */
+var PORT = 4000;
+
+var HOST = 'ip6-localhost';
+//var HOST = 'fdd5::1';
+
+var dgram = require("dgram");
+
+var udpserver = dgram.createSocket("udp6");
+
+udpserver.on("error", function (err) {
+  console.log("server error:\n" + err.stack);
+  udpserver.close();
+});
+
+udpserver.on("message", function (msg, rinfo) {
+  console.log("server got: " + msg + " from " +
+    rinfo.address + ":" + rinfo.port);
+});
+
+udpserver.on("listening", function () {
+  var address = udpserver.address();
+  console.log("server listening " +
+      address.address + ":" + address.port);
+});
+
+udpserver.bind(PORT);

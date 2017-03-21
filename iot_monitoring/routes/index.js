@@ -18,14 +18,6 @@ router.get('/test1', function(req, res, next) {
     res.render('chart', {});
 });
 
-router.get('/test2', function(req, res, next) {
-    res.render('network', {});
-});
-
-router.get('/test3', function(req, res, next) {
-    res.render('courbe', {});
-});
-
 
 router.get('/data', function(req, res, next) {
   res.setHeader('Content-Type', 'application/json');
