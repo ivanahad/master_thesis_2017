@@ -93,10 +93,8 @@ function onListening() {
 /*
  *  UPD server
  */
-var PORT = 4000;
-
-var HOST = 'ip6-localhost';
-//var HOST = 'fdd5::1';
+var PORT = 5678;
+//var HOST = 'ip6-localhost';
 
 var dgram = require("dgram");
 
