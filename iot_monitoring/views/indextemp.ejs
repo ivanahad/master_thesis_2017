@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+     <link href="./node_modules/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+    <div id="test">This is a test</div>
+  </body>
+  <script>
+    function loadTraffic(){
+      var xhttp = new XMLHttpRequest();
+      xhttp.onreadystatechange = function(){
+        console.log("This is it");
+        if (this.readyState == 4 && this.status == 200){
+          document.getElementById("test").innerHTML = this.responseText;
+        }
+      };
+      xhttp.open("GET", "http://localhost:3000/data", true);
+      xhttp.send();
+    }
+    setInterval(function(){
+      loadTraffic();
+    }, 5000);
+
+  </script>
+</html>
