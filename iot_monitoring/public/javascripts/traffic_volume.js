@@ -1,12 +1,3 @@
-var dataTest = [
-  {date: new Date(2007, 3, 24), volume: 10},
-  {date: new Date(2007, 3, 25), volume: 23},
-  {date: new Date(2007, 3, 26), volume: 5},
-  {date: new Date(2007, 3, 27), volume: 15},
-  {date: new Date(2007, 3, 30), volume: 23},
-  {date: new Date(2007, 4,  1), volume: 17},
-];
-
 var svg = d3.select("svg"),
     margin = {
         top: 20,
@@ -32,37 +23,70 @@ var line = d3.line()
     });
 
 var area = d3.area()
-    .x(function(d) { return x(d.date); })
+    .x(function(d) {
+        return x(d.date);
+    })
     .y1(function(d) {
-      return y(d.volume);
-     })
+        return y(d.volume);
+    })
     .y0(y(0));
 
-function drawChart(data){
-  // scale the range of the data
-  x.domain(d3.extent(data, function(d) { return d.date; }));
-  y.domain([0, d3.max(data, function(d) { return d.volume; })]);
+function drawChart(data) {
+    //Clean svg
+    g.selectAll("*").remove();
 
-  // add the area
-  g.append("path")
-     .data([data])
-     .attr("class", "area")
-     .attr("d", area);
+    // scale the range of the data
+    x.domain(d3.extent(data, function(d) {
+        return d.date;
+    }));
+    y.domain([0, d3.max(data, function(d) {
+        return d.volume;
+    })]);
 
- // add the valueline path.
- g.append("path")
-     .data([data])
-     .attr("class", "line")
-     .attr("d", line);
- // add the X Axis
- g.append("g")
-     .attr("transform", "translate(0," + height + ")")
-     .call(d3.axisBottom(x));
+    // add the area
+    g.append("path")
+        .data([data])
+        .attr("class", "area")
+        .attr("d", area);
 
- // add the Y Axis
- g.append("g")
-     .call(d3.axisLeft(y));
+    // add the valueline path.
+    g.append("path")
+        .data([data])
+        .attr("class", "line")
+        .attr("d", line);
+
+    // add the X Axis
+    g.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(d3.axisBottom(x));
+
+    // add the Y Axis
+    g.append("g")
+        .call(d3.axisLeft(y));
 
 }
 
-drawChart(dataTest);
+function parseDate(data){
+  data.forEach(function (d) {
+        var dateObj = new Date(d.date);
+        d.date = dateObj;
+        return d;
+    });
+}
+
+function loadTraffic() {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var data = JSON.parse(this.responseText);
+            parseDate(data);
+            drawChart(data);
+        }
+    };
+    xhttp.open("GET", "http://localhost:3000/traffic_volume", true);
+    xhttp.send();
+}
+
+setInterval(function() {
+    loadTraffic();
+}, 1 * 60 * 1000);
