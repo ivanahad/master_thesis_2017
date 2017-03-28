@@ -6,6 +6,7 @@
     <title>IoT monitoring</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -44,13 +45,44 @@
             </div>
             <!-- Chart -->
             <div class="row">
-                <!-- Display traffic volume -->
-                <svg width="720" height="375"></svg>
+                <div class="col-lg-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="fa fa-area-chart"></i> Traffic chart</h3>
+                        </div>
+                        <div class="panel-body">
+                            <svg width="720" height="375"></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Statistics</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-hover">
+                                <tr>
+                                    <th> </th>
+                                    <th>Average</th>
+                                    <th>Max</th>
+                                </tr>
+                                <tr>
+                                    <td>Traffic</td>
+                                    <td id="traffic_average">-</td>
+                                    <td id="traffic_max">-</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
     </div>
 
+    <script src="/javascripts/jquery-3.2.0.min.js"></script>
     <script src="//d3js.org/d3.v4.min.js"></script>
     <script src="/javascripts/traffic_volume.js"></script>
 </body>

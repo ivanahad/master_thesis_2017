@@ -27,6 +27,7 @@ var area = d3.area()
         return x(d.date);
     })
     .y1(function(d) {
+        n = d.volume
         return y(d.volume);
     })
     .y0(y(0));
@@ -74,6 +75,23 @@ function parseDate(data){
     });
 }
 
+function updateStatistics(data){
+  var max = 0;
+  var total = 0;
+  var n = 0;
+  data.forEach(function(d) {
+    var volume = d.volume;
+    n = n + 1;
+    total = total + volume;
+    if (volume > max){
+      max = volume;
+    }
+  });
+
+  document.getElementById("traffic_average").innerHTML = (total / n).toString();
+  document.getElementById("traffic_max").innerHTML = max.toString();
+}
+
 function loadTraffic() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -81,11 +99,14 @@ function loadTraffic() {
             var data = JSON.parse(this.responseText);
             parseDate(data);
             drawChart(data);
+            updateStatistics(data);
         }
     };
-    xhttp.open("GET", "http://localhost:3000/traffic_volume", true);
+    xhttp.open("GET", "/traffic_volume", true);
     xhttp.send();
 }
+
+loadTraffic();
 
 setInterval(function() {
     loadTraffic();
