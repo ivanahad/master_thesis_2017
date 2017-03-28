@@ -63,7 +63,9 @@ function drawChart(data) {
 
     // add the Y Axis
     g.append("g")
-        .call(d3.axisLeft(y));
+        .call(d3.axisLeft(y).tickFormat(function(d){
+          return d + "M";
+        }));
 
 }
 

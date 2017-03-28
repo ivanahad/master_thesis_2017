@@ -6,6 +6,10 @@ router.get('/', function(req, res, next) {
   res.render('index', {});
 });
 
+router.get('/topology', function(req, res, next) {
+  res.render('topology', {});
+});
+
 router.get('/traffic_volume', function(req, res, next) {
   res.setHeader('Content-Type', 'application/json');
   var data = [
