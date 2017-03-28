@@ -6,13 +6,7 @@
     <title>IoT monitoring</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
-    <style>
-        .line {
-            fill: none;
-            stroke: #000;
-            stroke-width: 1.5px;
-        }
-    </style>
+    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
@@ -39,74 +33,58 @@
         </div>
     </nav>
 
-    <!-- Display traffic volume -->
-    <svg width="960" height="500"></svg>
-    <script src="//d3js.org/d3.v4.min.js"></script>
-    <script>
-        var n = 40,
-            random = d3.randomNormal(0, .2),
-            data = d3.range(n).map(random);
-        var svg = d3.select("svg"),
-            margin = {
-                top: 20,
-                right: 20,
-                bottom: 20,
-                left: 40
-            },
-            width = +svg.attr("width") - margin.left - margin.right,
-            height = +svg.attr("height") - margin.top - margin.bottom,
-            g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-        var x = d3.scaleLinear()
-            .domain([0, n - 1])
-            .range([0, width]);
-        var y = d3.scaleLinear() // pour changer l'échelle
-            .domain([0, 1])
-            .range([height, 0]);
-        var line = d3.line()
-            .x(function(d, i) {
-                return x(i);
-            })
-            .y(function(d, i) {
-                return y(d);
-            });
-        g.append("defs").append("clipPath")
-            .attr("id", "clip")
-            .append("rect")
-            .attr("width", width)
-            .attr("height", height);
-        g.append("g")
-            .attr("class", "axis axis--x")
-            .attr("transform", "translate(0," + y(0) + ")")
-            .call(d3.axisBottom(x));
-        g.append("g")
-            .attr("class", "axis axis--y")
-            .call(d3.axisLeft(y));
-        g.append("g")
-            .attr("clip-path", "url(#clip)")
-            .append("path")
-            .datum(data)
-            .attr("class", "line")
-            .transition()
-            .duration(500)
-            .ease(d3.easeLinear)
-            .on("start", tick);
+    <div id="page-wrapper">
+        <div class="container-fluid">
+            <!-- Page Heading -->
+            <div class="row">
+                <div class="col-lg-12">
+                    <h1 class="page-header">
+                        Traffic
+                    </h1>
+                </div>
+            </div>
+            <!-- Chart -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="fa fa-area-chart"></i> Traffic chart</h3>
+                        </div>
+                        <div class="panel-body">
+                            <svg width="720" height="375"></svg>
+                        </div>
+                    </div>
+                </div>
 
-        function tick() {
-            // Push a new data point onto the back.
-            data.push(random());
-            // Redraw the line.
-            d3.select(this)
-                .attr("d", line)
-                .attr("transform", null);
-            // Slide it to the left.
-            d3.active(this)
-                .attr("transform", "translate(" + x(-1) + ",0)")
-                .transition()
-                .on("start", tick);
-            // Pop the old data point off the front.
-            data.shift();
-        }
-    </script>
+                <div class="col-lg-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Statistics</h3>
+                        </div>
+                        <div class="panel-body">
+                            <table class="table table-hover">
+                                <tr>
+                                    <th> </th>
+                                    <th>Average</th>
+                                    <th>Max</th>
+                                </tr>
+                                <tr>
+                                    <td>Traffic</td>
+                                    <td id="traffic_average">-</td>
+                                    <td id="traffic_max">-</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/javascripts/jquery-3.2.0.min.js"></script>
+    <script src="//d3js.org/d3.v4.min.js"></script>
+    <script src="/javascripts/traffic_volume.js"></script>
 </body>
 
 </html>
