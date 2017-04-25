@@ -7,6 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('iot-monitoring:server');
 var http = require('http');
+var Parser = require('binary-parser').Parser; //bit udp parser
+var fs = require('fs'); //file system to write files
 
 /**
  * Get port from environment and store in Express.
@@ -89,9 +91,62 @@ function onListening() {
   debug('Listening on ' + bind);
 }
 
+//specific parser for one data record. Subject to fail because of 64-unsigned bits (doublele)
+var record_parser = new Parser() 
+  .uint16('source_rime')
+  .uint16('destination_rime')
+  .doublele('octet_delta_count')
 
 /*
- *  UPD server
+ * Parsing function
+ */
+var netflowHeader = new Parser() 
+  // header of netflow packet
+  .endianess('little')
+  .uint16('version')
+  .uint16('length')
+  .uint32('export_time')
+  .uint32('sequence')
+  .uint32('dom_id')
+  
+  //header of record of data
+  
+  .uint16('record_set_id')
+  .uint16('record_length')
+  /*
+  for(i=0;i<'record_length';i++){
+    .uint16('source_rime')
+    .uint16('destination_rime')
+    .doublele('octet_delta_count')
+  }
+  */
+  .array('records', {
+    type: record_parser,
+    length:'record_length'
+  });
+
+
+//fs.writeFile("/home/user/Desktop/master_thesis_2017/iot_monitoring/bin/test.txt", netflowHeader.parse(buf) + "\n", function(err) {
+
+/* OSEF
+var path = '/home/user/Desktop/master_thesis_2017/iot_monitoring/bin',
+buffer = new Buffer(netflowHeader);
+fs.open(path, 'w', function(err, fd) {
+    if (err) {
+        throw 'error opening file: ' + err;
+    }
+
+    fs.write(fd, buffer, 0, buffer.length, null, function(err) {
+        if (err) throw 'error writing file: ' + err;
+        fs.close(fd, function() {
+            console.log('file written');
+        })
+    });
+});
+*/
+
+/*
+ *  UDP server
  */
 var PORT = 5678;
 //var HOST = 'ip6-localhost';
@@ -105,10 +160,38 @@ udpserver.on("error", function (err) {
   udpserver.close();
 });
 
+
 udpserver.on("message", function (msg, rinfo) {
+  var buf = new Buffer(msg, 'hex');
   console.log("server got: " + msg + " from " +
     rinfo.address + ":" + rinfo.port);
+  console.log(netflowHeader.parse(buf));
+
+  var str=JSON.stringify(netflowHeader.parse(buf));
+  fs.appendFile("/home/user/Desktop/master_thesis_2017/iot_monitoring/bin/test.txt", str+"\n", function(err) {
+    if(err) {
+        return console.log(err);
+    }
+
+    console.log("The file was saved!");
+  }); 
 });
+
+
+
+//Function to write to a json file the parsed bits. Msg is the parsed object's structure, path is location of written Json file
+/*
+function write_to_json (message_parsed, path){
+  var str=JSON.stringify(message_parsed);
+  fs.writeFile(path, str, function(err) {//2
+    if(err) {//3
+        return console.log(err);
+    }//3
+  console.log("The JSON file was saved yo!");
+  }
+}
+*/
+
 
 udpserver.on("listening", function () {
   var address = udpserver.address();
