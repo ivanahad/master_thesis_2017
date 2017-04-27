@@ -15,7 +15,9 @@ Ipfix.prototype.parse = function (binaryBuffer) {
   else{
     const copyBuffer = Buffer.alloc(binaryBuffer.length);
     binaryBuffer.copy(copyBuffer);
-    return ipfixMsg.parse(copyBuffer);
+    var ipfix_obj = ipfixMsg.parse(copyBuffer);
+    ipfix_obj = parseInformationElements(ipfix_obj);
+    return ipfix_obj;
   }
 };
 
@@ -28,15 +30,20 @@ const ipfixTemplate = new Parser()
     .uint16('count')
     .array('elements', {
       type: ipfixInfoElem,
-      length: 2
+      length: function(){return this.count;}
+    });
+
+const ipfixTemplates = new Parser()
+    .array('templates', {
+      type: ipfixTemplate,
+      readUntil: 'eof'
     });
 
 const ipfixSet = new Parser()
   .uint16('id')
   .uint16('length')
-  .array('templates', {
-    type: ipfixTemplate,
-    length: 1
+  .buffer('templates', {
+    length: function(){return this.length;}
   });
 
 const ipfixMsg = new Parser()
@@ -51,5 +58,20 @@ const ipfixMsg = new Parser()
     type: ipfixSet,
     readUntil: 'eof'
   });
+
+function parseInformationElements(ipfix_obj){
+  if(!ipfix_obj.sets){
+    return ipfix_obj;
+  }
+  for(var i in ipfix_obj.sets){
+    if(!ipfix_obj.sets[i].templates){
+      return ipfix_obj;
+    }
+    ipfix_obj.sets[i].templates =
+        ipfixTemplates.parse(ipfix_obj.sets[i].templates).templates;
+  }
+  return ipfix_obj;
+}
+
 
 module.exports = Ipfix;
