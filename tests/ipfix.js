@@ -80,6 +80,32 @@ describe('Ipfix template sets parsing', function(){
     expect(ipfix_obj.sets[0].templates[0].elements[1].id).to.equal(2);
     expect(ipfix_obj.sets[0].templates[0].elements[1].length).to.equal(8);
   });
+  it('should retrieve the template', function(){
+    var ipfix = new Ipfix();
+    ipfix.parse(ipfixTemplateMsg1);
+    expect(ipfix.getTemplate(1, 256)).to.be.not.null;
+  });
+  it('should return null when not finding template', function(){
+    var ipfix = new Ipfix();
+    ipfix.parse(ipfixTemplateMsg1);
+    expect(ipfix.getTemplate(1, 257)).to.be.null;
+  });
+});
+
+const ipfixTemplateMsg2 = Buffer.concat([
+  createIpfixHeader(10, 28, 1052, 1, 1),
+  createIpfixSetHeader(2, 12),
+  createIpfixSetTemplate(256, 2),
+  createIpfixInfoElem(1, 4),
+  createIpfixInfoElem(2, 4),
+  createIpfixSetHeader(256, 16),
+  createIpfixRecord(5, 4),
+  createIpfixRecord(9, 4),
+  createIpfixRecord(459, 4),
+  createIpfixRecord(3654, 4)
+], 32);
+
+describe('Ipfix data sets parsing', function(){
 
 });
 
@@ -115,5 +141,11 @@ function createIpfixInfoElem(id, length, eid){
   if(eid !== undefined){
     msg.writeUInt32BE(eid, 4);
   }
+  return msg;
+}
+
+function createIpfixRecord(value, length){
+  var msg = Buffer.alloc(length);
+  msg.writeUIntBE(value, 0, length);
   return msg;
 }
