@@ -43,8 +43,8 @@ describe('Ipfix header parsing', function(){
 });
 
 const ipfixTemplateMsg1 = Buffer.concat([
-  createIpfixHeader(10, 28, 1052, 1, 1),
-  createIpfixSetHeader(2, 12),
+  createIpfixHeader(10, 32, 1052, 1, 1),
+  createIpfixSetHeader(2, 16),
   createIpfixSetTemplate(256, 2),
   createIpfixInfoElem(1, 8),
   createIpfixInfoElem(2, 8)
@@ -59,7 +59,7 @@ describe('Ipfix template sets parsing', function(){
   it('should parse correctly set header length', function(){
     var ipfix = new Ipfix();
     var ipfix_obj = ipfix.parse(ipfixTemplateMsg1);
-    expect(ipfix_obj.sets[0].length).to.equal(12);
+    expect(ipfix_obj.sets[0].length).to.equal(16);
   });
   it('should parse correctly template set id', function(){
     var ipfix = new Ipfix();
@@ -93,20 +93,34 @@ describe('Ipfix template sets parsing', function(){
 });
 
 const ipfixTemplateMsg2 = Buffer.concat([
-  createIpfixHeader(10, 28, 1052, 1, 1),
-  createIpfixSetHeader(2, 12),
+  createIpfixHeader(10, 52, 1052, 1, 1),
+  createIpfixSetHeader(2, 16),
   createIpfixSetTemplate(256, 2),
   createIpfixInfoElem(1, 4),
   createIpfixInfoElem(2, 4),
-  createIpfixSetHeader(256, 16),
+  createIpfixSetHeader(256, 20),
   createIpfixRecord(5, 4),
   createIpfixRecord(9, 4),
   createIpfixRecord(459, 4),
   createIpfixRecord(3654, 4)
-], 32);
+], 52);
 
 describe('Ipfix data sets parsing', function(){
-
+  it('should parse correctly set header id', function(){
+    var ipfix = new Ipfix();
+    var ipfix_obj = ipfix.parse(ipfixTemplateMsg2);
+    expect(ipfix_obj.sets[1].id).to.equal(256);
+  });
+  it('should parse correctly set header length', function(){
+    var ipfix = new Ipfix();
+    var ipfix_obj = ipfix.parse(ipfixTemplateMsg2);
+    expect(ipfix_obj.sets[1].length).to.equal(20);
+  });
+  it('should parse correctly records', function(){
+    var ipfix = new Ipfix();
+    var ipfix_obj = ipfix.parse(ipfixTemplateMsg2);
+    expect(ipfix_obj.sets[1].data).to.have.lengthOf(2);
+  });
 });
 
 function createIpfixHeader(version, length, exportTime, seqNo, domainId){

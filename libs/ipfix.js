@@ -18,7 +18,7 @@ Ipfix.prototype.parse = function (binaryBuffer) {
     const copyBuffer = Buffer.alloc(binaryBuffer.length);
     binaryBuffer.copy(copyBuffer);
     var ipfix_obj = ipfixMsg.parse(copyBuffer);
-    ipfix_obj = parseInformationElements(ipfix_obj);
+    ipfix_obj = parseSetsContent(ipfix_obj);
     updateTemplates(ipfix_obj, this);
     return ipfix_obj;
   }
@@ -48,17 +48,19 @@ const ipfixTemplate = new Parser()
     });
 
 const ipfixTemplates = new Parser()
-    .array('templates', {
-      type: ipfixTemplate,
-      readUntil: 'eof'
-    });
+  .array('templates', {
+    type: ipfixTemplate,
+    readUntil: 'eof'
+  });
 
 const ipfixSet = new Parser()
   .uint16('id')
   .uint16('length')
-  .buffer('templates', {
-    length: function(){return this.length;}
+  .buffer('buff', {
+    length: function(){return this.length - 4;}
   });
+
+const ipfixData = new Parser();
 
 const ipfixMsg = new Parser()
   // Header
@@ -73,16 +75,22 @@ const ipfixMsg = new Parser()
     readUntil: 'eof'
   });
 
-function parseInformationElements(ipfix_obj){
+function parseSetsContent(ipfix_obj){
   if(!ipfix_obj.sets){
     return ipfix_obj;
   }
   for(var i in ipfix_obj.sets){
-    if(!ipfix_obj.sets[i].templates){
+    if(!ipfix_obj.sets[i].buff && !ipfix_obj.sets[i].buff.templates){
       continue;
     }
-    ipfix_obj.sets[i].templates =
-        ipfixTemplates.parse(ipfix_obj.sets[i].templates).templates;
+    if(ipfix_obj.sets[i].id == 2){ // Templates
+      ipfix_obj.sets[i].templates =
+        ipfixTemplates.parse(ipfix_obj.sets[i].buff).templates;
+    }
+    else{
+      // ipfix_obj.sets[i].data =
+      //   ipfixData.parse(ipfix_obj.sets[i].buff).data;
+    }
   }
   return ipfix_obj;
 }
