@@ -1,8 +1,8 @@
 const Parser = require('binary-parser').Parser;
 
-function Ipfix(){
-  this.templates = {};
-}
+function Ipfix(){}
+
+var templatesStore = {};
 
 Ipfix.HEADER_LENGTH = 16;
 
@@ -19,13 +19,12 @@ Ipfix.prototype.parse = function (binaryBuffer) {
     binaryBuffer.copy(copyBuffer);
     var ipfix_obj = ipfixMsg.parse(copyBuffer);
     ipfix_obj = parseSetsContent(ipfix_obj);
-    updateTemplates(ipfix_obj, this);
     return ipfix_obj;
   }
 };
 
 Ipfix.prototype.getTemplate = function(domainId, templateId){
-  const templates = this.templates[domainId];
+  const templates = templatesStore[domainId];
   if(!templates){
     return null;
   }
@@ -60,7 +59,13 @@ const ipfixSet = new Parser()
     length: function(){return this.length - 4;}
   });
 
-const ipfixData = new Parser();
+const ipfixData = function(dataParser){
+  return new Parser().
+    array('data', {
+      type: dataParser,
+      readUntil: 'eof'
+    });
+};
 
 const ipfixMsg = new Parser()
   // Header
@@ -86,16 +91,19 @@ function parseSetsContent(ipfix_obj){
     if(ipfix_obj.sets[i].id == 2){ // Templates
       ipfix_obj.sets[i].templates =
         ipfixTemplates.parse(ipfix_obj.sets[i].buff).templates;
+      updateTemplates(ipfix_obj);
     }
     else{
-      // ipfix_obj.sets[i].data =
-      //   ipfixData.parse(ipfix_obj.sets[i].buff).data;
+      var parser =
+          createParserBasedOnTemplate(ipfix_obj.domainId, ipfix_obj.sets[i].id);
+      ipfix_obj.sets[i].data =
+          ipfixData(parser).parse(ipfix_obj.sets[i].buff).data;
     }
   }
   return ipfix_obj;
 }
 
- function updateTemplates(ipfix_obj, cls){
+ function updateTemplates(ipfix_obj){
   if(!ipfix_obj.sets){
     return;
   }
@@ -106,12 +114,34 @@ function parseSetsContent(ipfix_obj){
     }
     for(var j in ipfix_obj.sets[i].templates){
       var template = ipfix_obj.sets[i].templates[j];
-      if(!cls.templates[domainId]){
-        cls.templates[domainId] = {};
+      if(!templatesStore[domainId]){
+        templatesStore[domainId] = {};
       }
-      cls.templates[domainId][template.id] = template;
+      templatesStore[domainId][template.id] = template;
     }
   }
+}
+
+function createParserBasedOnTemplate(domainId, templateId){
+  const template = Ipfix.prototype.getTemplate(domainId, templateId);
+  var parser = new Parser();
+  for(var i in template.elements){
+    const name = 'value' + i.toString();
+    switch(template.elements[i].length){
+      case 1:
+        parser = parser.uint8(name);
+        break;
+      case 2:
+        parser = parser.uint16(name);
+        break;
+      case 4:
+        parser = parser.uint32(name);
+        break;
+      default:
+        continue;
+    }
+  }
+  return parser;
 }
 
 

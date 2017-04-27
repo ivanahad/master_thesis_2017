@@ -47,7 +47,7 @@ const ipfixTemplateMsg1 = Buffer.concat([
   createIpfixSetHeader(2, 16),
   createIpfixSetTemplate(256, 2),
   createIpfixInfoElem(1, 8),
-  createIpfixInfoElem(2, 8)
+  createIpfixInfoElem(2, 5)
 ], 32);
 
 describe('Ipfix template sets parsing', function(){
@@ -78,7 +78,7 @@ describe('Ipfix template sets parsing', function(){
     expect(ipfix_obj.sets[0].templates[0].elements[0].id).to.equal(1);
     expect(ipfix_obj.sets[0].templates[0].elements[0].length).to.equal(8);
     expect(ipfix_obj.sets[0].templates[0].elements[1].id).to.equal(2);
-    expect(ipfix_obj.sets[0].templates[0].elements[1].length).to.equal(8);
+    expect(ipfix_obj.sets[0].templates[0].elements[1].length).to.equal(5);
   });
   it('should retrieve the template', function(){
     var ipfix = new Ipfix();
