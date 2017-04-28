@@ -94,10 +94,12 @@ function parseSetsContent(ipfix_obj){
       updateTemplates(ipfix_obj);
     }
     else{
+      const template = Ipfix.prototype.getTemplate(ipfix_obj.domainId, ipfix_obj.sets[i].id);
       var parser =
-          createParserBasedOnTemplate(ipfix_obj.domainId, ipfix_obj.sets[i].id);
+          createParserBasedOnTemplate(template);
       ipfix_obj.sets[i].data =
           ipfixData(parser).parse(ipfix_obj.sets[i].buff).data;
+      ipfix_obj.sets[i].template = template;
     }
   }
   return ipfix_obj;
@@ -122,8 +124,7 @@ function parseSetsContent(ipfix_obj){
   }
 }
 
-function createParserBasedOnTemplate(domainId, templateId){
-  const template = Ipfix.prototype.getTemplate(domainId, templateId);
+function createParserBasedOnTemplate(template){
   var parser = new Parser();
   for(var i in template.elements){
     const name = 'value' + i.toString();

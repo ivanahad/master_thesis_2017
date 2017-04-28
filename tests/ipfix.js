@@ -47,7 +47,7 @@ const ipfixTemplateMsg1 = Buffer.concat([
   createIpfixSetHeader(2, 16),
   createIpfixSetTemplate(256, 2),
   createIpfixInfoElem(1, 8),
-  createIpfixInfoElem(2, 5)
+  createIpfixInfoElem(2, 5),
 ], 32);
 
 describe('Ipfix template sets parsing', function(){

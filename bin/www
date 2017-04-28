@@ -7,8 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('iot-monitoring:server');
 var http = require('http');
-var Parser = require('binary-parser').Parser; //bit udp parser
 var fs = require('fs'); //file system to write files
+var Ipfix = require('../libs/ipfix');
 
 /**
  * Get port from environment and store in Express.
@@ -91,11 +91,13 @@ function onListening() {
 /*
  *  UDP server
  */
-var PORT = 9995;
+var PORT = 9997;
 
 var dgram = require("dgram");
 
 var udpserver = dgram.createSocket("udp6");
+
+var ipfix = new Ipfix();
 
 udpserver.on("error", function (err) {
   console.log("server error:\n" + err.stack);
@@ -107,7 +109,7 @@ udpserver.on("message", function (msg, rinfo) {
   var buf = new Buffer(msg, 'hex');
   console.log("server got: " + msg + " from " +
     rinfo.address + ":" + rinfo.port);
-
+  console.log(ipfix.parse(msg));
 });
 
 
