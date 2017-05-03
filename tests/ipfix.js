@@ -50,6 +50,14 @@ const ipfixTemplateMsg1 = Buffer.concat([
   createIpfixInfoElem(2, 5),
 ], 32);
 
+const ipfixTemplateMsg2 = Buffer.concat([
+  createIpfixHeader(10, 36, 1052, 1, 1),
+  createIpfixSetHeader(2, 20),
+  createIpfixSetTemplate(256, 2),
+  createIpfixInfoElem(1, 8),
+  createIpfixInfoElem(32780, 5, 45),
+], 36);
+
 describe('Ipfix template sets parsing', function(){
   it('should parse correctly set header id', function(){
     var ipfix = new Ipfix();
@@ -90,9 +98,16 @@ describe('Ipfix template sets parsing', function(){
     ipfix.parse(ipfixTemplateMsg1);
     expect(ipfix.getTemplate(1, 257)).to.be.null;
   });
+  it('should retrieve the eid', function(){
+    var ipfix = new Ipfix();
+    var ipfix_obj = ipfix.parse(ipfixTemplateMsg2);
+    expect(ipfix_obj.sets[0].templates[0].elements[1].id).to.equal(32780);
+    expect(ipfix_obj.sets[0].templates[0].elements[1].eid).to.equal(45);
+    expect(ipfix_obj.sets[0].templates[0].elements[1].length).to.equal(5);
+  });
 });
 
-const ipfixTemplateMsg2 = Buffer.concat([
+const ipfixTemplateMsg3 = Buffer.concat([
   createIpfixHeader(10, 52, 1052, 1, 1),
   createIpfixSetHeader(2, 16),
   createIpfixSetTemplate(256, 2),
@@ -108,20 +123,21 @@ const ipfixTemplateMsg2 = Buffer.concat([
 describe('Ipfix data sets parsing', function(){
   it('should parse correctly set header id', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixTemplateMsg2);
+    var ipfix_obj = ipfix.parse(ipfixTemplateMsg3);
     expect(ipfix_obj.sets[1].id).to.equal(256);
   });
   it('should parse correctly set header length', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixTemplateMsg2);
+    var ipfix_obj = ipfix.parse(ipfixTemplateMsg3);
     expect(ipfix_obj.sets[1].length).to.equal(20);
   });
   it('should parse correctly records', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixTemplateMsg2);
+    var ipfix_obj = ipfix.parse(ipfixTemplateMsg3);
     expect(ipfix_obj.sets[1].data).to.have.lengthOf(2);
   });
 });
+
 
 function createIpfixHeader(version, length, exportTime, seqNo, domainId){
   var msg = Buffer.alloc(16);

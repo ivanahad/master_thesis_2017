@@ -17,8 +17,7 @@ Ipfix.prototype.parse = function (binaryBuffer) {
   else{
     const copyBuffer = Buffer.alloc(binaryBuffer.length);
     binaryBuffer.copy(copyBuffer);
-    var ipfix_obj = ipfixMsg.parse(copyBuffer);
-    ipfix_obj = parseSetsContent(ipfix_obj);
+    var ipfix_obj = parseMessage(copyBuffer);
     return ipfix_obj;
   }
 };
@@ -34,115 +33,116 @@ Ipfix.prototype.getTemplate = function(domainId, templateId){
   return templates[templateId];
 };
 
-const ipfixInfoElem = new Parser()
-    .uint16('id')
-    .uint16('length');
-
-const ipfixTemplate = new Parser()
-    .uint16('id')
-    .uint16('count')
-    .array('elements', {
-      type: ipfixInfoElem,
-      length: function(){return this.count;}
-    });
-
-const ipfixTemplates = new Parser()
-  .array('templates', {
-    type: ipfixTemplate,
-    readUntil: 'eof'
-  });
-
-const ipfixSet = new Parser()
-  .uint16('id')
-  .uint16('length')
-  .buffer('buff', {
-    length: function(){return this.length - 4;}
-  });
-
-const ipfixData = function(dataParser){
-  return new Parser().
-    array('data', {
-      type: dataParser,
-      readUntil: 'eof'
-    });
-};
-
-const ipfixMsg = new Parser()
-  // Header
-  .uint16('version')
-  .uint16('length')
-  .uint32('exportTime')
-  .uint32('seqNo')
-  .uint32('domainId')
-  // Sets
-  .array('sets', {
-    type: ipfixSet,
-    readUntil: 'eof'
-  });
-
-function parseSetsContent(ipfix_obj){
-  if(!ipfix_obj.sets){
-    return ipfix_obj;
+ function updateTemplates(template, templateId, domainId){
+  if(!templatesStore[domainId]){
+    templatesStore[domainId] = {};
   }
-  for(var i in ipfix_obj.sets){
-    if(!ipfix_obj.sets[i].buff && !ipfix_obj.sets[i].buff.templates){
-      continue;
-    }
-    if(ipfix_obj.sets[i].id == 2){ // Templates
-      ipfix_obj.sets[i].templates =
-        ipfixTemplates.parse(ipfix_obj.sets[i].buff).templates;
-      updateTemplates(ipfix_obj);
-    }
-    else{
-      const template = Ipfix.prototype.getTemplate(ipfix_obj.domainId, ipfix_obj.sets[i].id);
-      var parser =
-          createParserBasedOnTemplate(template);
-      ipfix_obj.sets[i].data =
-          ipfixData(parser).parse(ipfix_obj.sets[i].buff).data;
-      ipfix_obj.sets[i].template = template;
-    }
-  }
+  templatesStore[domainId][template.id] = template;
+}
+
+function parseMessage(buff){
+  var ipfix_obj = parseHeader(buff);
+
+  buff = buff.slice(16);
+  ipfix_obj.sets = parseSets(buff, ipfix_obj.domainId);
+
   return ipfix_obj;
 }
 
- function updateTemplates(ipfix_obj){
-  if(!ipfix_obj.sets){
-    return;
-  }
-  const domainId = ipfix_obj.domainId;
-  for(var i in ipfix_obj.sets){
-    if(!ipfix_obj.sets[i].templates){
-      continue;
-    }
-    for(var j in ipfix_obj.sets[i].templates){
-      var template = ipfix_obj.sets[i].templates[j];
-      if(!templatesStore[domainId]){
-        templatesStore[domainId] = {};
-      }
-      templatesStore[domainId][template.id] = template;
-    }
-  }
+function parseHeader(buff){
+  var obj = {};
+  obj.version = buff.readUInt16BE();
+  obj.length = buff.readUInt16BE(2);
+  obj.exportTime = buff.readUInt32BE(4);
+  obj.seqNo = buff.readUInt32BE(8);
+  obj.domainId = buff.readUInt32BE(12);
+
+  return obj;
 }
 
-function createParserBasedOnTemplate(template){
-  var parser = new Parser();
-  for(var i in template.elements){
-    const name = 'value' + i.toString();
-    switch(template.elements[i].length){
-      case 1:
-        parser = parser.uint8(name);
-        break;
-      case 2:
-        parser = parser.uint16(name);
-        break;
-      case 4:
-        parser = parser.uint32(name);
-        break;
-      default:
-        continue;
+function parseSets(buff, domainId){
+  var sets = [];
+  var offset = 0;
+
+  while(offset < buff.length){
+    var set_obj = {};
+    set_obj.id = buff.readUInt16BE(offset);
+    set_obj.length = buff.readUInt16BE(offset+2);
+
+    if(set_obj.id == 2){ // Templates set
+      set_obj.templates = parseTemplates(buff.slice(offset+4, offset+set_obj.length), domainId);
     }
+    else{  // Data set
+      set_obj.data = parseData(buff.slice(offset+4, offset+set_obj.length), set_obj.id, domainId);
+    }
+    sets.push(set_obj);
+    offset = offset + set_obj.length;
   }
-  return parser;
+  return sets;
+}
+
+function parseTemplates(buff, domainId){
+  var offset = 0;
+  var templates = [];
+  while (offset < buff.length) {  // Templates
+    var template_obj = {};
+    template_obj.id = buff.readUInt16BE(offset);
+    template_obj.count = buff.readUInt16BE(offset+2);
+    template_obj.elements = [];
+
+    offset = offset + 4;
+    for(var i = 0; i < template_obj.count; i++){  // Information elements
+      var element = {};
+      element.id = buff.readUInt16BE(offset);
+      element.length = buff.readUInt16BE(offset+2);
+      offset = offset + 4;
+      if(element.id > 32768){
+        element.eid = buff.readUInt32BE(offset);
+        offset = offset + 4;
+      }
+      else{
+        element.eid = 0;
+      }
+      template_obj.elements.push(element);
+    }
+    templates.push(template_obj);
+    updateTemplates(template_obj, template_obj.id, domainId);
+  }
+  return templates;
+}
+
+function parseData(buff, templateId, domainId){
+  var records = [];
+  var offset = 0;
+  const template = Ipfix.prototype.getTemplate(domainId, templateId);
+
+  while(offset < buff.length){
+    var record = [];
+
+    for(var i = 0; i < template.elements.length; i++){
+      var value = {};
+      value.id = template.elements[i].id;
+      value.eid = template.elements[i].eid;
+      value.value = parseValue(buff, template.elements[i].length, offset);
+      record.push(value);
+      offset = offset + template.elements[i].length;
+    }
+    records.push(record);
+  }
+  return records;
+}
+
+function parseValue(buff, length, offset){
+  switch(length){
+    case 1:
+      return buff.readUInt8BE(offset);
+    case 2:
+      return buff.readUInt16BE(offset);
+    case 4:
+      return buff.readUInt32BE(offset);
+    default:
+      return null;
+  }
 }
 
 
