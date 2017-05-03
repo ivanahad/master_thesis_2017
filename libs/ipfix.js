@@ -17,8 +17,8 @@ Ipfix.prototype.parse = function (binaryBuffer) {
   else{
     const copyBuffer = Buffer.alloc(binaryBuffer.length);
     binaryBuffer.copy(copyBuffer);
-    var ipfix_obj = parseMessage(copyBuffer);
-    return ipfix_obj;
+    var ipfixObj = parseMessage(copyBuffer);
+    return ipfixObj;
   }
 };
 
@@ -41,12 +41,12 @@ Ipfix.prototype.getTemplate = function(domainId, templateId){
 }
 
 function parseMessage(buff){
-  var ipfix_obj = parseHeader(buff);
+  var ipfixObj = parseHeader(buff);
 
   buff = buff.slice(16);
-  ipfix_obj.sets = parseSets(buff, ipfix_obj.domainId);
+  ipfixObj.sets = parseSets(buff, ipfixObj.domainId);
 
-  return ipfix_obj;
+  return ipfixObj;
 }
 
 function parseHeader(buff){

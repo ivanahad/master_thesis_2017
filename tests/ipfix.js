@@ -17,28 +17,28 @@ describe('Ipfix header parsing', function(){
   });
   it('should parse correctly ipfix version', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixHeader);
-    expect(ipfix_obj.version).to.equal(10);
+    var ipfixObj = ipfix.parse(ipfixHeader);
+    expect(ipfixObj.version).to.equal(10);
   });
   it('should parse correctly ipfix length', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixHeader);
-    expect(ipfix_obj.length).to.equal(16);
+    var ipfixObj = ipfix.parse(ipfixHeader);
+    expect(ipfixObj.length).to.equal(16);
   });
   it('should parse correctly ipfix exportTime', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixHeader);
-    expect(ipfix_obj.exportTime).to.equal(45);
+    var ipfixObj = ipfix.parse(ipfixHeader);
+    expect(ipfixObj.exportTime).to.equal(45);
   });
   it('should parse correctly ipfix sequence number', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixHeader);
-    expect(ipfix_obj.seqNo).to.equal(1);
+    var ipfixObj = ipfix.parse(ipfixHeader);
+    expect(ipfixObj.seqNo).to.equal(1);
   });
   it('should parse correctly ipfix domain ID', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixHeader);
-    expect(ipfix_obj.domainId).to.equal(1);
+    var ipfixObj = ipfix.parse(ipfixHeader);
+    expect(ipfixObj.domainId).to.equal(1);
   });
 });
 
@@ -61,32 +61,32 @@ const ipfixTemplateMsg2 = Buffer.concat([
 describe('Ipfix template sets parsing', function(){
   it('should parse correctly set header id', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixTemplateMsg1);
-    expect(ipfix_obj.sets[0].id).to.equal(2);
+    var ipfixObj = ipfix.parse(ipfixTemplateMsg1);
+    expect(ipfixObj.sets[0].id).to.equal(2);
   });
   it('should parse correctly set header length', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixTemplateMsg1);
-    expect(ipfix_obj.sets[0].length).to.equal(16);
+    var ipfixObj = ipfix.parse(ipfixTemplateMsg1);
+    expect(ipfixObj.sets[0].length).to.equal(16);
   });
   it('should parse correctly template set id', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixTemplateMsg1);
-    expect(ipfix_obj.sets[0].templates[0].id).to.equal(256);
+    var ipfixObj = ipfix.parse(ipfixTemplateMsg1);
+    expect(ipfixObj.sets[0].templates[0].id).to.equal(256);
   });
   it('should parse correctly template set fields count', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixTemplateMsg1);
-    expect(ipfix_obj.sets[0].templates[0].count).to.equal(2);
+    var ipfixObj = ipfix.parse(ipfixTemplateMsg1);
+    expect(ipfixObj.sets[0].templates[0].count).to.equal(2);
   });
   it('should parse correctly information elements', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixTemplateMsg1);
-    expect(ipfix_obj.sets[0].templates[0].elements).to.have.lengthOf(2);
-    expect(ipfix_obj.sets[0].templates[0].elements[0].id).to.equal(1);
-    expect(ipfix_obj.sets[0].templates[0].elements[0].length).to.equal(8);
-    expect(ipfix_obj.sets[0].templates[0].elements[1].id).to.equal(2);
-    expect(ipfix_obj.sets[0].templates[0].elements[1].length).to.equal(5);
+    var ipfixObj = ipfix.parse(ipfixTemplateMsg1);
+    expect(ipfixObj.sets[0].templates[0].elements).to.have.lengthOf(2);
+    expect(ipfixObj.sets[0].templates[0].elements[0].id).to.equal(1);
+    expect(ipfixObj.sets[0].templates[0].elements[0].length).to.equal(8);
+    expect(ipfixObj.sets[0].templates[0].elements[1].id).to.equal(2);
+    expect(ipfixObj.sets[0].templates[0].elements[1].length).to.equal(5);
   });
   it('should retrieve the template', function(){
     var ipfix = new Ipfix();
@@ -100,10 +100,10 @@ describe('Ipfix template sets parsing', function(){
   });
   it('should retrieve the eid', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixTemplateMsg2);
-    expect(ipfix_obj.sets[0].templates[0].elements[1].id).to.equal(32780);
-    expect(ipfix_obj.sets[0].templates[0].elements[1].eid).to.equal(45);
-    expect(ipfix_obj.sets[0].templates[0].elements[1].length).to.equal(5);
+    var ipfixObj = ipfix.parse(ipfixTemplateMsg2);
+    expect(ipfixObj.sets[0].templates[0].elements[1].id).to.equal(32780);
+    expect(ipfixObj.sets[0].templates[0].elements[1].eid).to.equal(45);
+    expect(ipfixObj.sets[0].templates[0].elements[1].length).to.equal(5);
   });
 });
 
@@ -123,18 +123,18 @@ const ipfixTemplateMsg3 = Buffer.concat([
 describe('Ipfix data sets parsing', function(){
   it('should parse correctly set header id', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixTemplateMsg3);
-    expect(ipfix_obj.sets[1].id).to.equal(256);
+    var ipfixObj = ipfix.parse(ipfixTemplateMsg3);
+    expect(ipfixObj.sets[1].id).to.equal(256);
   });
   it('should parse correctly set header length', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixTemplateMsg3);
-    expect(ipfix_obj.sets[1].length).to.equal(20);
+    var ipfixObj = ipfix.parse(ipfixTemplateMsg3);
+    expect(ipfixObj.sets[1].length).to.equal(20);
   });
   it('should parse correctly records', function(){
     var ipfix = new Ipfix();
-    var ipfix_obj = ipfix.parse(ipfixTemplateMsg3);
-    expect(ipfix_obj.sets[1].data).to.have.lengthOf(2);
+    var ipfixObj = ipfix.parse(ipfixTemplateMsg3);
+    expect(ipfixObj.sets[1].data).to.have.lengthOf(2);
   });
 });
 
