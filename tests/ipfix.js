@@ -6,14 +6,9 @@ const Ipfix = require('../libs/ipfix');
 const ipfixHeader = createIpfixHeader(10, 16, 45, 1, 1);
 
 describe('Ipfix header parsing', function(){
-  it('should return null if no data is passed', function(){
+  it('should throw error if no data is passed', function(){
     var ipfix = new Ipfix();
-    expect(ipfix.parse()).to.be.null;
-  });
-  it('should return null if message length less than 16 bytes', function(){
-    var ipfix = new Ipfix();
-    var msg = Buffer.alloc(10);
-    expect(ipfix.parse(msg)).to.be.null;
+    expect(function(){ipfix.parse();}).to.throw(Error);
   });
   it('should parse correctly ipfix version', function(){
     var ipfix = new Ipfix();

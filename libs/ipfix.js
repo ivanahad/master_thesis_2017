@@ -9,17 +9,14 @@ Ipfix.HEADER_LENGTH = 16;
 // TODO throw errors
 Ipfix.prototype.parse = function (binaryBuffer) {
   if(!binaryBuffer){
-    return null;
+    throw new Error("Ipfix parsing: empty/undefined message");
   }
-  else if (binaryBuffer.length < Ipfix.HEADER_LENGTH) {
-    return null;
-  }
-  else{
-    const copyBuffer = Buffer.alloc(binaryBuffer.length);
-    binaryBuffer.copy(copyBuffer);
-    var ipfixObj = parseMessage(copyBuffer);
-    return ipfixObj;
-  }
+
+  const copyBuffer = Buffer.alloc(binaryBuffer.length);
+  binaryBuffer.copy(copyBuffer);
+  var ipfixObj = parseMessage(copyBuffer);
+  return ipfixObj;
+
 };
 
 Ipfix.prototype.getTemplate = function(domainId, templateId){

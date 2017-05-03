@@ -4,36 +4,39 @@
  * Module dependencies.
  */
 
-var dgram = require("dgram");
-var Collector = require('../libs/collector');
+const dgram = require("dgram");
+const Collector = require('../libs/collector');
+const util = require('util');
+
+const debuglog = util.debuglog('collector');
 
 /*
  *  UDP server
  */
-var PORT = 9995;
+const PORT = 9995;
 
-var udpserver = dgram.createSocket("udp6");
-var collector = new Collector();
+const udpserver = dgram.createSocket("udp6");
+const collector = new Collector();
 
 udpserver.on("error", function (err) {
-  console.log("server error:\n" + err.stack);
+  debuglog("server error:\n" + err.stack);
   udpserver.close();
 });
 
 
 udpserver.on("message", function (msg, rinfo) {
   var buf = new Buffer(msg, 'hex');
-  console.log("Received msg from " +
+  debuglog("Received msg from " +
     rinfo.address + ":" + rinfo.port +
     "( " + msg.length + " bytes)");
-  console.log(ipfix.parse(msg));
+  debuglog(ipfix.parse(msg));
   collector.processMsg(msg);
 });
 
 
 udpserver.on("listening", function () {
   var address = udpserver.address();
-  console.log("server listening " +
+  debuglog("server listening " +
       address.address + ":" + address.port);
 });
 
