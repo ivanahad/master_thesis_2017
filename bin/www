@@ -7,8 +7,6 @@
 var app = require('../app');
 var debug = require('debug')('iot-monitoring:server');
 var http = require('http');
-var fs = require('fs'); //file system to write files
-var Ipfix = require('../libs/ipfix');
 
 /**
  * Get port from environment and store in Express.
@@ -86,37 +84,3 @@ function onListening() {
   var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
-
-
-/*
- *  UDP server
- */
-var PORT = 9997;
-
-var dgram = require("dgram");
-
-var udpserver = dgram.createSocket("udp6");
-
-var ipfix = new Ipfix();
-
-udpserver.on("error", function (err) {
-  console.log("server error:\n" + err.stack);
-  udpserver.close();
-});
-
-
-udpserver.on("message", function (msg, rinfo) {
-  var buf = new Buffer(msg, 'hex');
-  console.log("server got: " + msg + " from " +
-    rinfo.address + ":" + rinfo.port);
-  console.log(ipfix.parse(msg));
-});
-
-
-udpserver.on("listening", function () {
-  var address = udpserver.address();
-  console.log("server listening " +
-      address.address + ":" + address.port);
-});
-
-udpserver.bind(PORT);
