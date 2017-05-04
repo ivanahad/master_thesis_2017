@@ -13,6 +13,7 @@ const db = pgp(connectionString);
 
 module.exports = {
   logIpfix : logIpfix,
+  getLatestMsg: getLatestMsg,
 };
 
 function logIpfix(ipfixObj){
@@ -30,12 +31,13 @@ function getLatestMsg(){
   const epochSeconds = (new Date()).getTime() * 1000;
   const hourInSeconds = 60*60;
   const limit = epochSeconds - hourInSeconds;
-  db.any("SELECT * FROM log WHERE export_time >= now() - interval '1 hour'")
+  db.any("SELECT * FROM logs WHERE export_time >= now() - interval '1 hour'")
     .then(data => {
       debuglog("DB: Fetched latest messages");
       console.log(data);
     })
     .catch(error => {
       debuglog("DB: Problem when fetching latest messages");
+      console.error(error);
     });
 }
