@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var db = require('../libs/queries');
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
@@ -12,6 +13,7 @@ router.get('/topology', function(req, res, next) {
 
 router.get('/traffic_volume', function(req, res, next) {
   res.setHeader('Content-Type', 'application/json');
+  db.getLatestMsg();
   var data = [
     {date: new Date(2007, 3, 24), volume: 10},
     {date: new Date(2007, 3, 25), volume: 23},
