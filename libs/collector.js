@@ -1,5 +1,5 @@
-const Ipfix = require('ipfix');
-const DB = require('queries');
+const Ipfix = require('./ipfix');
+const DB = require('./queries');
 const util = require('util');
 
 const debuglog = util.debuglog('collector');

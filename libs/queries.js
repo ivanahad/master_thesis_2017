@@ -8,7 +8,7 @@ const options = {
 };
 
 const pgp = require('pg-promise')(options);
-const connectionString = 'postgres://localhost:5432/ipfix';
+const connectionString = 'postgres://postgres:postgres@localhost:5432/ipfix';
 const db = pgp(connectionString);
 
 module.exports = {
@@ -16,12 +16,13 @@ module.exports = {
 };
 
 function logIpfix(ipfixObj){
-  db.none('INSERT INTO log(domain_id, export_time, seq_no, data) VALUES(${domainId}, to_timestamp(${exportTime}), ${seqNo}, ${this}})', ipfixObj)
+  db.none('INSERT INTO logs(domain_id, export_time, seq_no, data) VALUES(${domainId}, to_timestamp(${exportTime}), ${seqNo}, ${this})', ipfixObj)
     .then(() => {
         debuglog("DB: Logged data");
     })
     .catch(error => {
-        debuglog("DB: Problem when logging \n" + ipfixObj);
+        debuglog("DB: Problem when logging \n");
+        console.error(error);
     });
 }
 

@@ -29,7 +29,6 @@ udpserver.on("message", function (msg, rinfo) {
   debuglog("Received msg from " +
     rinfo.address + ":" + rinfo.port +
     "( " + msg.length + " bytes)");
-  debuglog(ipfix.parse(msg));
   collector.processMsg(msg);
 });
 
