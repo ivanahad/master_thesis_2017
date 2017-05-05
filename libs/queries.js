@@ -27,14 +27,14 @@ function logIpfix(ipfixObj){
     });
 }
 
-function getLatestMsg(){
+function getLatestMsg(f){
   const epochSeconds = (new Date()).getTime() * 1000;
   const hourInSeconds = 60*60;
   const limit = epochSeconds - hourInSeconds;
   db.any("SELECT * FROM logs WHERE export_time >= now() - interval '1 hour'")
     .then(data => {
       debuglog("DB: Fetched latest messages");
-      return data;
+      return f(data);
     })
     .catch(error => {
       debuglog("DB: Problem when fetching latest messages");

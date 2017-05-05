@@ -51,7 +51,7 @@ const element2 = {
   data: {
     version: 10,
     length: 20,
-    exportTime: 0,
+    exportTime: 86500,
     seqNo: 1,
     domainId: 1,
     sets: [
@@ -102,16 +102,22 @@ const element2 = {
 describe('Total traffic volume computation', function(){
   it('should return empty array if no data', function(){
     var stats = new Stats();
-    expect(stats.getTrafficVolume([])).to.be.empty;
+    expect(stats.computeTrafficVolume([])).to.be.empty;
   });
   it('should extract correct traffic volume for one element', function(){
     var stats = new Stats();
-    var volumes = stats.getTrafficVolume([element1]);
+    var volumes = stats.computeTrafficVolume([element1]);
     expect(volumes[0].volume).to.equal(200);
   });
   it('should aggregate traffic volumes for multiple records', function(){
     var stats = new Stats();
-    var volumes = stats.getTrafficVolume([element2]);
+    var volumes = stats.computeTrafficVolume([element2]);
     expect(volumes[0].volume).to.equal(500);
+  });
+  it('should separate traffic volume by data', function(){
+    var stats = new Stats();
+    var volumes = stats.computeTrafficVolume([element1, element2]);
+    console.log(volumes);
+    expect(volumes).to.have.lengthOf(2);
   });
 });
