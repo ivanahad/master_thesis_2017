@@ -34,10 +34,11 @@ function getLatestMsg(){
   db.any("SELECT * FROM logs WHERE export_time >= now() - interval '1 hour'")
     .then(data => {
       debuglog("DB: Fetched latest messages");
-      console.log(data);
+      return data;
     })
     .catch(error => {
       debuglog("DB: Problem when fetching latest messages");
       console.error(error);
+      return null;
     });
 }

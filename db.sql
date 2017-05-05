@@ -9,5 +9,5 @@ CREATE TABLE logs (
   export_time timestamp NOT NULL,
   seq_no integer CHECK (seq_no > 0) NOT NULL,
   data json NOT NULL,
-  UNIQUE(domain_id, export_time)
+  UNIQUE(domain_id, export_time, seq_no)
 )
