@@ -71,7 +71,7 @@ function drawChart(data) {
 
 function parseDate(data){
   data.forEach(function (d) {
-        var dateObj = new Date(d.date);
+        var dateObj = new Date(d.time * 1000);
         d.date = dateObj;
         return d;
     });
