@@ -1,13 +1,10 @@
-const Parser = require('binary-parser').Parser;
+var exports = module.exports = {};
 
-function Ipfix(){}
+const HEADER_LENGTH = 16;
 
 var templatesStore = {};
 
-Ipfix.HEADER_LENGTH = 16;
-
-// TODO throw errors
-Ipfix.prototype.parse = function (binaryBuffer) {
+exports.parse = function (binaryBuffer) {
   if(!binaryBuffer){
     throw new Error("Ipfix parsing: empty/undefined message");
   }
@@ -19,7 +16,7 @@ Ipfix.prototype.parse = function (binaryBuffer) {
 
 };
 
-Ipfix.prototype.getTemplate = function(domainId, templateId){
+function getTemplate(domainId, templateId){
   const templates = templatesStore[domainId];
   if(!templates){
     return null;
@@ -28,9 +25,9 @@ Ipfix.prototype.getTemplate = function(domainId, templateId){
     return null;
   }
   return templates[templateId];
-};
+}
 
- function updateTemplates(template, templateId, domainId){
+function updateTemplates(template, templateId, domainId){
   if(!templatesStore[domainId]){
     templatesStore[domainId] = {};
   }
@@ -111,7 +108,7 @@ function parseTemplates(buff, domainId){
 function parseData(buff, templateId, domainId){
   var records = [];
   var offset = 0;
-  const template = Ipfix.prototype.getTemplate(domainId, templateId);
+  const template = getTemplate(domainId, templateId);
 
   while(offset < buff.length){
     var record = [];
@@ -141,6 +138,3 @@ function parseValue(buff, length, offset){
       return null;
   }
 }
-
-
-module.exports = Ipfix;

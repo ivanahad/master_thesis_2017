@@ -1,28 +1,16 @@
 #!/usr/bin/env node
-
-/**
- * Module dependencies.
- */
-
 const dgram = require("dgram");
-const Collector = require('../libs/collector');
-const util = require('util');
+const collector = require('../libs/collector');
+const debuglog = require('util').debuglog('collector');
 
-const debuglog = util.debuglog('collector');
-
-/*
- *  UDP server
- */
 const PORT = 9995;
 
 const udpserver = dgram.createSocket("udp6");
-const collector = new Collector();
 
 udpserver.on("error", function (err) {
   debuglog("server error:\n" + err.stack);
   udpserver.close();
 });
-
 
 udpserver.on("message", function (msg, rinfo) {
   var buf = new Buffer(msg, 'hex');
@@ -31,7 +19,6 @@ udpserver.on("message", function (msg, rinfo) {
     "( " + msg.length + " bytes)");
   collector.processMsg(msg);
 });
-
 
 udpserver.on("listening", function () {
   var address = udpserver.address();
