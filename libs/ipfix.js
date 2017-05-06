@@ -16,6 +16,22 @@ exports.parse = function (binaryBuffer) {
 
 };
 
+exports.getRecords = function(ipfixObj){
+  var records = [];
+  for(var j in ipfixObj.sets){
+    const set = ipfixObj.sets[j];
+    for(var k in set.data){
+      const dataSet = set.data[k];
+      var setRecords = [];
+      for(var l in dataSet){
+        setRecords.push(dataSet[l]);
+      }
+      records.push(setRecords);
+    }
+  }
+  return records;
+};
+
 function getTemplate(domainId, templateId){
   const templates = templatesStore[domainId];
   if(!templates){

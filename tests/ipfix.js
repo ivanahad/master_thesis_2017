@@ -108,6 +108,16 @@ describe('Ipfix data sets parsing', function(){
   });
 });
 
+describe('Ipfix get records', function(){
+  it('should return empty when no records', function(){
+    var ipfixObj = ipfix.parse(ipfixTemplateMsg2);
+    expect(ipfix.getRecords(ipfixObj)).to.be.empty;
+  });
+  it('should return all records', function(){
+    var ipfixObj = ipfix.parse(ipfixTemplateMsg3);
+    expect(ipfix.getRecords(ipfixObj)).to.have.lengthOf(2);
+  });
+});
 
 function createIpfixHeader(version, length, exportTime, seqNo, domainId){
   var msg = Buffer.alloc(16);

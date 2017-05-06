@@ -1,5 +1,6 @@
 const debuglog = require('util').debuglog('status');
 const ipfixEnum = require('./ipfix-enum');
+const ipfix = require('./ipfix');
 
 const entrInfoElements = ipfixEnum.entrepriseInformationElements;
 
@@ -37,33 +38,29 @@ function createNode(nodeId){
 }
 
 function updateParent(ipfixObj, nodeId){
-  for(var j in ipfixObj.sets){
-    const set = ipfixObj.sets[j];
-    for(var k in set.data){
-      const dataSet = set.data[k];
-      for(var l in dataSet){
-        const record = dataSet[l];
-        if(record.id == entrInfoElements.PARENT){
-          nodeId.parent = record.value;
-          return;
-        }
+  const records = ipfix.getRecords(ipfixObj);
+  for(var i in records){
+    const record = records[i];
+    for(var j in record){
+      const element = record[j];
+      if(element.id == entrInfoElements.PARENT){
+        nodeId.parent = element.value;
+        return;
       }
     }
   }
 }
 
 function updateBattery(ipfixObj, nodeId){
-  for(var j in ipfixObj.sets){
-    const set = ipfixObj.sets[j];
-    for(var k in set.data){
-      const dataSet = set.data[k];
-      for(var l in dataSet){
-        const record = dataSet[l];
-        if(record.id == entrInfoElements.BATTERY){
-          nodeId.battery = record.value;
+  const records = ipfix.getRecords(ipfixObj);
+  for(var i in records){
+    const record = records[i];
+    for(var j in record){
+      const element = record[j];
+        if(element.id == entrInfoElements.BATTERY){
+          nodeId.battery = element.value;
           return;
         }
-      }
     }
   }
 }
