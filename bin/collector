@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 const dgram = require("dgram");
-const collector = require('../libs/collector');
 const debuglog = require('util').debuglog('collector');
+const ipfix = require('../libs/ipfix');
+const DB = require('../libs/queries');
 
 const PORT = 9995;
 
@@ -17,12 +18,17 @@ udpserver.on("message", function (msg, rinfo) {
   debuglog("Received msg from " +
     rinfo.address + ":" + rinfo.port +
     "( " + msg.length + " bytes)");
-  collector.processMsg(msg);
+  try {
+    var ipfixObj = ipfix.parse(msg);
+    DB.logIpfix(ipfixObj);
+  } catch (e) {
+    debuglog("Collector: problem when processing msg");
+  }
 });
 
 udpserver.on("listening", function () {
   var address = udpserver.address();
-  debuglog("server listening " +
+  debuglog("Collector listening " +
       address.address + ":" + address.port);
 });
 
