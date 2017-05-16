@@ -26,7 +26,13 @@ router.get('/traffic_volume', function(req, res, next) {
 router.get('/nodes_data', function(req, res, next) {
     res.setHeader('Content-Type', 'application/json');
     var data = [
-        {ID : 1, parent : 2, battery : 52},
+        {ID : "1", parent : "5", battery : "52"},
+        {ID : "2", parent : "5", battery : "50"},
+        {ID : "3", parent : "6", battery : "49"},
+        {ID : "4", parent : "6", battery : "100"},
+        {ID : "5", parent : "7", battery : "30"},
+        {ID : "6", parent : "7", battery : "15"},
+        {ID : "7", parent : "none", battery : "5"}
     ];
     res.send(JSON.stringify(data));
 });
