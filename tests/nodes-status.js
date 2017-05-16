@@ -3,10 +3,6 @@ const expect = chai.expect;
 const Nodes = require('../libs/nodes-status');
 const ipfixEnum = require('../libs/ipfix-enum');
 
-const infoElements = ipfixEnum.informationElements;
-const entrInfoElements = ipfixEnum.entrepriseInformationElements;
-
-
 const data1 = {
   version: 10,
   length: 28,
@@ -20,12 +16,12 @@ const data1 = {
       data: [
         [
           {
-            id: entrInfoElements.PARENT,
+            id: 32772,
             eid: 20613,
             value: 2
           },
           {
-            id: entrInfoElements.BATTERY,
+            id: 32773,
             eid: 20613,
             value: 80
           }

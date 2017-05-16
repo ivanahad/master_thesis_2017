@@ -1,9 +1,6 @@
-const debuglog = require('util').debuglog('status');
-const ipfixEnum = require('./ipfix-enum');
+const IpfixEnum = require('./ipfix-enum');
 const ipfix = require('./ipfix');
 const Node = require('./node');
-
-const entrInfoElements = ipfixEnum.entrepriseInformationElements;
 
 class NodesStatus {
   constructor() {
@@ -22,35 +19,22 @@ class NodesStatus {
   }
 
   feedIpfix(ipfixObj){
-    this.nodes[ipfixObj.domainId] = new Node(ipfixObj.domainId);
-    this.updateParent(ipfixObj, this.nodes[ipfixObj.domainId]);
-    this.updateBattery(ipfixObj, this.nodes[ipfixObj.domainId]);
+    var node = new Node(ipfixObj.domainId);
+    this.nodes[ipfixObj.domainId] = node;
+    this.updateStatus(ipfixObj, node, IpfixEnum.PARENT);
+    this.updateStatus(ipfixObj, node, IpfixEnum.BATTERY);
   }
 
-  updateParent(ipfixObj, node){
+  updateStatus(ipfixObj, node, informationElement){
     const records = ipfix.getRecords(ipfixObj);
     for(var i in records){
       const record = records[i];
       for(var j in record){
         const element = record[j];
-        if(element.id == entrInfoElements.PARENT){
-          node.setParent(element.value);
+        if(element.id == informationElement.id){
+          node.updateStatus(informationElement.name, element.value);
           return;
         }
-      }
-    }
-  }
-
-  updateBattery(ipfixObj, node){
-    const records = ipfix.getRecords(ipfixObj);
-    for(var i in records){
-      const record = records[i];
-      for(var j in record){
-        const element = record[j];
-          if(element.id == entrInfoElements.BATTERY){
-            node.updateStatus("battery", element.value);
-            return;
-          }
       }
     }
   }
