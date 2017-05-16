@@ -1,66 +1,49 @@
-const debuglog = require('util').debuglog('status');
-const ipfixEnum = require('./ipfix-enum');
+const IpfixEnum = require('./ipfix-enum');
 const ipfix = require('./ipfix');
+const Node = require('./node');
 
-const entrInfoElements = ipfixEnum.entrepriseInformationElements;
-
-var exports = module.exports = {};
-
-var nodes = {};
-
-exports.getAll = function(){
-  return nodes;
-};
-
-exports.get = function(nodeId){
-  if(nodeId.toString() in nodes){
-    return nodes[nodeId.toString()];
+class NodesStatus {
+  constructor() {
+    this.nodes = {};
   }
-  return null;
-};
 
-exports.feedData = function(ipfixObj){
-  nodes[ipfixObj.domainId] = createNode(ipfixObj.domainId);
-  updateParent(ipfixObj, nodes[ipfixObj.domainId]);
-  updateBattery(ipfixObj, nodes[ipfixObj.domainId]);
-};
+  getNodes(){
+    return this.nodes;
+  }
 
-exports.clean = function(){
-  nodes = {};
-};
+  get(nodeId){
+    if(!(nodeId in this.nodes)){
+      return null;
+    }
+    return this.nodes[nodeId];
+  }
 
-function createNode(nodeId){
-  return {
-    id: nodeId,
-    parent : null,
-    battery: null,
-  };
-}
+  feedIpfix(ipfixObj){
+    var node = new Node(ipfixObj.domainId);
+    this.nodes[ipfixObj.domainId] = node;
+    this.updateStatus(ipfixObj, node, IpfixEnum.PARENT);
+    this.updateStatus(ipfixObj, node, IpfixEnum.BATTERY);
+  }
 
-function updateParent(ipfixObj, nodeId){
-  const records = ipfix.getRecords(ipfixObj);
-  for(var i in records){
-    const record = records[i];
-    for(var j in record){
-      const element = record[j];
-      if(element.id == entrInfoElements.PARENT){
-        nodeId.parent = element.value;
-        return;
+  updateStatus(ipfixObj, node, informationElement){
+    const records = ipfix.getRecords(ipfixObj);
+    for(var i in records){
+      const record = records[i];
+      for(var j in record){
+        const element = record[j];
+        if(element.id == informationElement.id){
+          node.updateStatus(informationElement.name, element.value);
+          return;
+        }
       }
     }
   }
-}
 
-function updateBattery(ipfixObj, nodeId){
-  const records = ipfix.getRecords(ipfixObj);
-  for(var i in records){
-    const record = records[i];
-    for(var j in record){
-      const element = record[j];
-        if(element.id == entrInfoElements.BATTERY){
-          nodeId.battery = element.value;
-          return;
-        }
-    }
+  clean (){
+    this.nodes = {};
   }
 }
+
+const onlyInstance = new NodesStatus();
+
+module.exports = onlyInstance;
