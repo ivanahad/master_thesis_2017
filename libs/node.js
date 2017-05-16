@@ -1,7 +1,6 @@
 class Node {
   constructor(id) {
     this.id = id;
-    this.parent = null;
     this.lastMessages = [];
     this.lastUpdate = null;
     this.status = {};
@@ -12,11 +11,11 @@ class Node {
   }
 
   setParent(parentId){
-    this.parent = parentId;
+    this.updateStatus("parent", parentId);
   }
 
   getParent(){
-    return this.parent;
+    return this.getStatus("parent");
   }
 
   addMessage(ipfixObj){

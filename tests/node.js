@@ -1,6 +1,6 @@
 const chai = require('chai');
 const expect = chai.expect;
-const Node = require('../libs/nodes');
+const Node = require('../libs/node');
 
 describe('Node class', function(){
   var node;

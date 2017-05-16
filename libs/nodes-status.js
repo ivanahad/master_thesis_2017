@@ -1,66 +1,65 @@
 const debuglog = require('util').debuglog('status');
 const ipfixEnum = require('./ipfix-enum');
 const ipfix = require('./ipfix');
+const Node = require('./node');
 
 const entrInfoElements = ipfixEnum.entrepriseInformationElements;
 
-var exports = module.exports = {};
-
-var nodes = {};
-
-exports.getAll = function(){
-  return nodes;
-};
-
-exports.get = function(nodeId){
-  if(nodeId.toString() in nodes){
-    return nodes[nodeId.toString()];
+class NodesStatus {
+  constructor() {
+    this.nodes = {};
   }
-  return null;
-};
 
-exports.feedData = function(ipfixObj){
-  nodes[ipfixObj.domainId] = createNode(ipfixObj.domainId);
-  updateParent(ipfixObj, nodes[ipfixObj.domainId]);
-  updateBattery(ipfixObj, nodes[ipfixObj.domainId]);
-};
+  getNodes(){
+    return this.nodes;
+  }
 
-exports.clean = function(){
-  nodes = {};
-};
+  get(nodeId){
+    if(!(nodeId in this.nodes)){
+      return null;
+    }
+    return this.nodes[nodeId];
+  }
 
-function createNode(nodeId){
-  return {
-    id: nodeId,
-    parent : null,
-    battery: null,
-  };
-}
+  feedIpfix(ipfixObj){
+    this.nodes[ipfixObj.domainId] = new Node(ipfixObj.domainId);
+    this.updateParent(ipfixObj, this.nodes[ipfixObj.domainId]);
+    this.updateBattery(ipfixObj, this.nodes[ipfixObj.domainId]);
+  }
 
-function updateParent(ipfixObj, nodeId){
-  const records = ipfix.getRecords(ipfixObj);
-  for(var i in records){
-    const record = records[i];
-    for(var j in record){
-      const element = record[j];
-      if(element.id == entrInfoElements.PARENT){
-        nodeId.parent = element.value;
-        return;
+  updateParent(ipfixObj, node){
+    const records = ipfix.getRecords(ipfixObj);
+    for(var i in records){
+      const record = records[i];
+      for(var j in record){
+        const element = record[j];
+        if(element.id == entrInfoElements.PARENT){
+          node.setParent(element.value);
+          return;
+        }
       }
     }
   }
-}
 
-function updateBattery(ipfixObj, nodeId){
-  const records = ipfix.getRecords(ipfixObj);
-  for(var i in records){
-    const record = records[i];
-    for(var j in record){
-      const element = record[j];
-        if(element.id == entrInfoElements.BATTERY){
-          nodeId.battery = element.value;
-          return;
-        }
+  updateBattery(ipfixObj, node){
+    const records = ipfix.getRecords(ipfixObj);
+    for(var i in records){
+      const record = records[i];
+      for(var j in record){
+        const element = record[j];
+          if(element.id == entrInfoElements.BATTERY){
+            node.updateStatus("battery", element.value);
+            return;
+          }
+      }
     }
   }
+
+  clean (){
+    this.nodes = {};
+  }
 }
+
+const onlyInstance = new NodesStatus();
+
+module.exports = onlyInstance;
