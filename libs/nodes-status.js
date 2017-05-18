@@ -18,9 +18,19 @@ class NodesStatus {
     return this.nodes[nodeId];
   }
 
+  getOrCreate(nodeId){
+    var node = this.get(nodeId);
+    if(node === null){
+      node = new Node(nodeId);
+      this.nodes[nodeId] = node;
+    }
+    return node;
+  }
+
   feedIpfix(ipfixObj){
-    var node = new Node(ipfixObj.domainId);
-    this.nodes[ipfixObj.domainId] = node;
+    var node = this.getOrCreate(ipfixObj.domainId);
+    node.addMessage(ipfixObj);
+
     this.updateStatus(ipfixObj, node, IpfixEnum.PARENT);
     this.updateStatus(ipfixObj, node, IpfixEnum.BATTERY);
   }
