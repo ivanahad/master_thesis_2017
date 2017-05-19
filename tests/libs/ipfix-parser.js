@@ -1,32 +1,32 @@
 const chai = require('chai');
 const expect = chai.expect;
-const ipfix = require('../libs/ipfix');
+const IpfixParser = require('../../libs/ipfix-parser');
 
 // Tests data
 const ipfixHeader = createIpfixHeader(10, 16, 45, 1, 1);
 
 describe('Ipfix header parsing', function(){
   it('should throw error if no data is passed', function(){
-    expect(function(){ipfix.parse();}).to.throw(Error);
+    expect(function(){IpfixParserparse();}).to.throw(Error);
   });
   it('should parse correctly ipfix version', function(){
-    var ipfixObj = ipfix.parse(ipfixHeader);
+    var ipfixObj = IpfixParser.parse(ipfixHeader);
     expect(ipfixObj.version).to.equal(10);
   });
   it('should parse correctly ipfix length', function(){
-    var ipfixObj = ipfix.parse(ipfixHeader);
+    var ipfixObj = IpfixParser.parse(ipfixHeader);
     expect(ipfixObj.length).to.equal(16);
   });
   it('should parse correctly ipfix exportTime', function(){
-    var ipfixObj = ipfix.parse(ipfixHeader);
+    var ipfixObj = IpfixParser.parse(ipfixHeader);
     expect(ipfixObj.exportTime).to.equal(45);
   });
   it('should parse correctly ipfix sequence number', function(){
-    var ipfixObj = ipfix.parse(ipfixHeader);
+    var ipfixObj = IpfixParser.parse(ipfixHeader);
     expect(ipfixObj.seqNo).to.equal(1);
   });
   it('should parse correctly ipfix domain ID', function(){
-    var ipfixObj = ipfix.parse(ipfixHeader);
+    var ipfixObj = IpfixParser.parse(ipfixHeader);
     expect(ipfixObj.domainId).to.equal(1);
   });
 });
@@ -49,23 +49,23 @@ const ipfixTemplateMsg2 = Buffer.concat([
 
 describe('Ipfix template sets parsing', function(){
   it('should parse correctly set header id', function(){
-    var ipfixObj = ipfix.parse(ipfixTemplateMsg1);
+    var ipfixObj = IpfixParser.parse(ipfixTemplateMsg1);
     expect(ipfixObj.sets[0].id).to.equal(2);
   });
   it('should parse correctly set header length', function(){
-    var ipfixObj = ipfix.parse(ipfixTemplateMsg1);
+    var ipfixObj = IpfixParser.parse(ipfixTemplateMsg1);
     expect(ipfixObj.sets[0].length).to.equal(16);
   });
   it('should parse correctly template set id', function(){
-    var ipfixObj = ipfix.parse(ipfixTemplateMsg1);
+    var ipfixObj = IpfixParser.parse(ipfixTemplateMsg1);
     expect(ipfixObj.sets[0].templates[0].id).to.equal(256);
   });
   it('should parse correctly template set fields count', function(){
-    var ipfixObj = ipfix.parse(ipfixTemplateMsg1);
+    var ipfixObj = IpfixParser.parse(ipfixTemplateMsg1);
     expect(ipfixObj.sets[0].templates[0].count).to.equal(2);
   });
   it('should parse correctly information elements', function(){
-    var ipfixObj = ipfix.parse(ipfixTemplateMsg1);
+    var ipfixObj = IpfixParser.parse(ipfixTemplateMsg1);
     expect(ipfixObj.sets[0].templates[0].elements).to.have.lengthOf(2);
     expect(ipfixObj.sets[0].templates[0].elements[0].id).to.equal(1);
     expect(ipfixObj.sets[0].templates[0].elements[0].length).to.equal(8);
@@ -73,7 +73,7 @@ describe('Ipfix template sets parsing', function(){
     expect(ipfixObj.sets[0].templates[0].elements[1].length).to.equal(5);
   });
   it('should retrieve the eid', function(){
-    var ipfixObj = ipfix.parse(ipfixTemplateMsg2);
+    var ipfixObj = IpfixParser.parse(ipfixTemplateMsg2);
     expect(ipfixObj.sets[0].templates[0].elements[1].id).to.equal(32780);
     expect(ipfixObj.sets[0].templates[0].elements[1].eid).to.equal(45);
     expect(ipfixObj.sets[0].templates[0].elements[1].length).to.equal(5);
@@ -95,27 +95,27 @@ const ipfixTemplateMsg3 = Buffer.concat([
 
 describe('Ipfix data sets parsing', function(){
   it('should parse correctly set header id', function(){
-    var ipfixObj = ipfix.parse(ipfixTemplateMsg3);
+    var ipfixObj = IpfixParser.parse(ipfixTemplateMsg3);
     expect(ipfixObj.sets[1].id).to.equal(256);
   });
   it('should parse correctly set header length', function(){
-    var ipfixObj = ipfix.parse(ipfixTemplateMsg3);
+    var ipfixObj = IpfixParser.parse(ipfixTemplateMsg3);
     expect(ipfixObj.sets[1].length).to.equal(20);
   });
   it('should parse correctly records', function(){
-    var ipfixObj = ipfix.parse(ipfixTemplateMsg3);
+    var ipfixObj = IpfixParser.parse(ipfixTemplateMsg3);
     expect(ipfixObj.sets[1].data).to.have.lengthOf(2);
   });
 });
 
 describe('Ipfix get records', function(){
   it('should return empty when no records', function(){
-    var ipfixObj = ipfix.parse(ipfixTemplateMsg2);
-    expect(ipfix.getRecords(ipfixObj)).to.be.empty;
+    var ipfixObj = IpfixParser.parse(ipfixTemplateMsg2);
+    expect(IpfixParser.getRecords(ipfixObj)).to.be.empty;
   });
   it('should return all records', function(){
-    var ipfixObj = ipfix.parse(ipfixTemplateMsg3);
-    expect(ipfix.getRecords(ipfixObj)).to.have.lengthOf(2);
+    var ipfixObj = IpfixParser.parse(ipfixTemplateMsg3);
+    expect(IpfixParser.getRecords(ipfixObj)).to.have.lengthOf(2);
   });
 });
 

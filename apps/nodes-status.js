@@ -1,6 +1,6 @@
 const collectorEmitter = require('./collector').collectorEmitter;
 const IpfixEnum = require('../libs/ipfix-enum');
-const ipfix = require('../libs/ipfix');
+const IpfixParser = require('../libs/ipfix-parser');
 const Node = require('../libs/node');
 
 class NodesStatus {
@@ -37,7 +37,7 @@ class NodesStatus {
   }
 
   updateStatus(ipfixObj, node, informationElement){
-    const records = ipfix.getRecords(ipfixObj);
+    const records = IpfixParser.getRecords(ipfixObj);
     for(var i in records){
       const record = records[i];
       for(var j in record){
