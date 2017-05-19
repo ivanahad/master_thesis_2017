@@ -1,10 +1,16 @@
+const Ipfix = require('./ipfix');
 var exports = module.exports = {};
 
 const HEADER_LENGTH = 16;
 
 var templatesStore = {};
 
-exports.parse = function (binaryBuffer) {
+exports.parse = function(binaryBuffer){
+  const ipfixJson = parseToJson(binaryBuffer);
+  return new Ipfix(ipfixJson);
+};
+
+exports.parseToJson = function (binaryBuffer) {
   if(!binaryBuffer){
     throw new Error("Ipfix parsing: empty/undefined message");
   }

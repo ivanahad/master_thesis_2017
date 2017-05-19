@@ -28,16 +28,16 @@ class NodesStatus {
     return node;
   }
 
-  feedIpfix(ipfixObj){
-    var node = this.getOrCreate(ipfixObj.domainId);
-    node.addMessage(ipfixObj);
+  feedIpfix(ipfix){
+    var node = this.getOrCreate(ipfix.domainId);
+    node.addMessage(ipfix);
 
-    this.updateStatus(ipfixObj, node, IpfixEnum.PARENT);
-    this.updateStatus(ipfixObj, node, IpfixEnum.BATTERY);
+    this.updateStatus(ipfix.json, node, IpfixEnum.PARENT);
+    this.updateStatus(ipfix.json, node, IpfixEnum.BATTERY);
   }
 
-  updateStatus(ipfixObj, node, informationElement){
-    const records = IpfixParser.getRecords(ipfixObj);
+  updateStatus(ipfix, node, informationElement){
+    const records = IpfixParser.getRecords(ipfix);
     for(var i in records){
       const record = records[i];
       for(var j in record){
@@ -59,8 +59,8 @@ const onlyInstance = new NodesStatus();
 
 module.exports = {
   startNodes: function(){
-    collectorEmitter.on('message', function(ipfixObj){
-      onlyInstance.feedIpfix(ipfixObj);
+    collectorEmitter.on('message', function(ipfix){
+      onlyInstance.feedIpfix(ipfix);
     });
   },
   instance: onlyInstance

@@ -10,8 +10,8 @@ const pgp = require('pg-promise')(options);
 const connectionString = 'postgres://postgres:postgres@localhost:5432/ipfix';
 const db = pgp(connectionString);
 
-logIpfix = function(ipfixObj){
-  db.none('INSERT INTO logs(domain_id, export_time, seq_no, data) VALUES(${domainId}, to_timestamp(${exportTime}), ${seqNo}, ${this})', ipfixObj)
+logIpfix = function(ipfix){
+  db.none('INSERT INTO logs(domain_id, export_time, seq_no, data) VALUES(${domainId}, to_timestamp(${exportTime}), ${seqNo}, ${this})', ipfix.json)
     .then(() => {
         debuglog("DB: Logged data");
     })
@@ -23,8 +23,8 @@ logIpfix = function(ipfixObj){
 
 module.exports = {
   startLogging : function(){
-    collectorEmitter.on('message', function(ipfixObj){
-      logIpfix(ipfixObj);
+    collectorEmitter.on('message', function(ipfix){
+      logIpfix(ipfix);
     });
   }
 };

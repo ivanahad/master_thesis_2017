@@ -13,7 +13,7 @@ class Ipfix {
   }
 
   static loadTemplatesFromJson(ipfixJson){
-    const templates = []
+    const templates = [];
     const sets = ipfixJson.sets;
     for(var i in sets){
 

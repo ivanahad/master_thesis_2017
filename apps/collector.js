@@ -1,5 +1,5 @@
 const dgram = require("dgram");
-const ipfix = require('../libs/ipfix');
+const IpfixParser = require('../libs/ipfix-parser');
 const EventEmitter = require('events');
 const debuglog = require('util').debuglog('collector');
 
@@ -19,8 +19,8 @@ udpserver.on("message", function (msg, rinfo) {
   debuglog("Received msg from " + rinfo.address + ":" + rinfo.port +
     "( " + msg.length + " bytes)");
   try {
-    var ipfixObj = ipfix.parse(msg);
-    collectorEmitter.emit('message', ipfixObj);
+    var ipfix = IpfixParser.parse(msg);
+    collectorEmitter.emit('message', ipfix);
   } catch (e) {
     debuglog("Collector: problem when processing msg");
   }
