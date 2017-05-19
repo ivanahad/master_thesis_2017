@@ -1,6 +1,6 @@
 const chai = require('chai');
 const expect = chai.expect;
-const Nodes = require('../libs/nodes-status');
+const Nodes = require('../apps/nodes-status').instance;
 const ipfixEnum = require('../libs/ipfix-enum');
 
 const data1 = {

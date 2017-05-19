@@ -1,23 +1,12 @@
-#!/usr/bin/env node
 var app = require('../app');
-var debug = require('debug')('iot-monitoring:server');
 var http = require('http');
-var Collector = require('../libs/collector');
-
-/**
- * Get port from environment and store in Express.
- */
+var debuglog = require('util').debuglog('web');
 
 var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
-/**
- * Create HTTP server.
- */
-
 var server = http.createServer(app);
 
-server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
@@ -61,10 +50,11 @@ function onError(error) {
 function onListening() {
   var addr = server.address();
   var bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  debuglog('Listening on ' + bind);
 }
 
-/**
- * Start collector
- */
- Collector.startCollector();
+module.exports = {
+  startHttpServer: function(){
+    server.listen(port);
+  }
+};

@@ -1,6 +1,7 @@
-const IpfixEnum = require('./ipfix-enum');
-const ipfix = require('./ipfix');
-const Node = require('./node');
+const collectorEmitter = require('./collector').collectorEmitter;
+const IpfixEnum = require('../libs/ipfix-enum');
+const ipfix = require('../libs/ipfix');
+const Node = require('../libs/node');
 
 class NodesStatus {
   constructor() {
@@ -56,4 +57,11 @@ class NodesStatus {
 
 const onlyInstance = new NodesStatus();
 
-module.exports = onlyInstance;
+module.exports = {
+  startNodes: function(){
+    collectorEmitter.on('message', function(ipfixObj){
+      onlyInstance.feedIpfix(ipfixObj);
+    });
+  },
+  instance: onlyInstance
+};
