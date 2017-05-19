@@ -26,6 +26,28 @@ const ipfixJson = {
           }
         ]
       ]
+    },
+    {
+      id: 2,
+      length: 2,
+      templates: [
+        {
+          id: 256,
+          count: 2,
+          elements: [
+            {
+              id: 32772,
+              eid: 20613,
+              length: 2
+            },
+            {
+              id: 32773,
+              eid: 20613,
+              length: 2
+            }
+          ]
+        }
+      ]
     }
   ]
 };
@@ -51,5 +73,17 @@ describe('Ipfix class', function(){
     expect(ipfix.records[0].fields[1].eid).to.equal(20613);
     expect(ipfix.records[0].fields[1].value).to.equal(80);
 
-  })
+  });
+
+  it('should load templates from json', function(){
+    const ipfix = new Ipfix(ipfixJson);
+    expect(ipfix.templates).to.have.lengthOf(1);
+    expect(ipfix.templates[0].fields[0].id).to.equal(32772);
+    expect(ipfix.templates[0].fields[0].eid).to.equal(20613);
+    expect(ipfix.templates[0].fields[0].length).to.equal(2);
+    expect(ipfix.templates[0].fields[1].id).to.equal(32773);
+    expect(ipfix.templates[0].fields[1].eid).to.equal(20613);
+    expect(ipfix.templates[0].fields[1].length).to.equal(2);
+
+  });
 });

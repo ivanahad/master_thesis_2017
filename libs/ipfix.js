@@ -7,22 +7,34 @@ class Ipfix {
     this.exportTime = ipfixJson.exportTime;
     this.seqNo = ipfixJson.seqNo;
     this.domainId = ipfixJson.domainId;
-    this.templates = [];
+    this.templates = Ipfix.loadTemplatesFromJson(ipfixJson);
     this.records = Ipfix.loadRecordsFromJson(ipfixJson);
     this.json = ipfixJson;
   }
 
   static loadTemplatesFromJson(ipfixJson){
+    const templates = []
     const sets = ipfixJson.sets;
     for(var i in sets){
+
       const set = sets[i];
       if(set.id != TEMPLATE_SET_ID){
         continue;
       }
       for(var j in set.templates){
+
         const template = set.templates[j];
+        var templateObj = new Template(template.id);
+
+        for(var k in template.elements){
+
+          const field = template.elements[k];
+          templateObj.addField(field.id, field.length, field.eid);
+        }
+        templates.push(templateObj);
       }
     }
+    return templates;
   }
 
   static loadRecordsFromJson(ipfixJson){
@@ -35,9 +47,11 @@ class Ipfix {
         continue;
       }
       for(var j in set.data){
+
         var recordObj = new Record(set.id);
         const record = set.data[j];
         for(var k in record){
+
           const field = record[k];
           recordObj.addField(field.id, field.value, field.eid);
         }
