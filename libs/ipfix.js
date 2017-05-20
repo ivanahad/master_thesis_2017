@@ -85,6 +85,42 @@ class Ipfix {
     this.data.push(record);
   }
 
+  getValues(){
+    var listInfoElem = arguments;
+    var values = [];
+    for(var i in this.records){
+      const record = this.records[i];
+
+      var result = {};
+      for(var j in record.fields){
+        const field = record.fields[j];
+        const infoElem = Ipfix.matchInfoElements(listInfoElem, field);
+        if(infoElem !== null){
+          result[infoElem.name] = field.value;
+        }
+      }
+
+      if(Object.keys(result).length == listInfoElem.length){
+        values.push(result);
+      }
+
+    }
+    return values;
+  }
+
+  static matchInfoElements(listInfoElem, field){
+    for(var i in listInfoElem){
+      const infoElem = listInfoElem[i];
+      if(Ipfix.matchInfoElement(infoElem, field)){
+        return infoElem;
+      }
+    }
+    return null;
+  }
+
+  static matchInfoElement(infoElem, field){
+    return infoElem.id == field.id && infoElem.eid == field.eid;
+  }
 }
 
 class Template {

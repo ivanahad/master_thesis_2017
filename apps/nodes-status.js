@@ -1,5 +1,5 @@
 const collectorEmitter = require('./collector').collectorEmitter;
-const IpfixEnum = require('../libs/ipfix-enum');
+const InfoElem = require('../libs/informationElements');
 const IpfixParser = require('../libs/ipfix-parser');
 const Node = require('../libs/node');
 
@@ -32,8 +32,8 @@ class NodesStatus {
     var node = this.getOrCreate(ipfix.domainId);
     node.addMessage(ipfix);
 
-    this.updateStatus(ipfix.json, node, IpfixEnum.PARENT);
-    this.updateStatus(ipfix.json, node, IpfixEnum.BATTERY);
+    this.updateStatus(ipfix.json, node, InfoElem.PARENT);
+    this.updateStatus(ipfix.json, node, InfoElem.BATTERY);
   }
 
   updateStatus(ipfix, node, informationElement){
