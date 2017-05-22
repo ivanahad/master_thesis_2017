@@ -1,4 +1,4 @@
-const DEFAULT_ENTREPRISE_NUMBER = 20613; // Louvain-la-Neuve
+const DEFAULT_ENTREPRISE_NUMBER = 20763; // Louvain-la-Neuve
 
 class InformationElement {
   constructor(name, id, eid) {

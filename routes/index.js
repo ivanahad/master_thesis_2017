@@ -1,4 +1,5 @@
 var express = require('express');
+var Log = require('../apps/dblog');
 var router = express.Router();
 
 /* GET home page. */
@@ -11,9 +12,8 @@ router.get('/topology', function(req, res, next) {
 });
 
 router.get('/network_traffic', function(req, res, next) {
-  res.render('network_traffic', {
-    x: ['2013-10-04 22:23:00', '2013-11-04 22:23:00', '2013-12-04 22:23:00'],
-    y: [1, 3, 6],
+  Log.getLogs((volumes) => {
+    res.render('network_traffic', {data: JSON.stringify(volumes)});
   });
 });
 

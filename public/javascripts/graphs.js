@@ -11,7 +11,7 @@ function plotTraffic(x, y, divId) {
       showgrid: false
     },
     yaxis: {
-      title: 'Mb'
+      title: 'Bytes'
     }
   };
 

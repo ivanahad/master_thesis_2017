@@ -17,12 +17,12 @@ const ipfixJson = {
         [
           {
             id: 32772,
-            eid: 20613,
+            eid: 20763,
             value: 2
           },
           {
             id: 32773,
-            eid: 20613,
+            eid: 20763,
             value: 80
           }
         ]
@@ -38,12 +38,12 @@ const ipfixJson = {
           elements: [
             {
               id: 32772,
-              eid: 20613,
+              eid: 20763,
               length: 2
             },
             {
               id: 32773,
-              eid: 20613,
+              eid: 20763,
               length: 2
             }
           ]
@@ -70,10 +70,10 @@ describe('Ipfix constructor', function(){
   it('should load records from json', function(){
     expect(ipfix.records).to.have.lengthOf(1);
     expect(ipfix.records[0].fields[0].id).to.equal(32772);
-    expect(ipfix.records[0].fields[0].eid).to.equal(20613);
+    expect(ipfix.records[0].fields[0].eid).to.equal(20763);
     expect(ipfix.records[0].fields[0].value).to.equal(2);
     expect(ipfix.records[0].fields[1].id).to.equal(32773);
-    expect(ipfix.records[0].fields[1].eid).to.equal(20613);
+    expect(ipfix.records[0].fields[1].eid).to.equal(20763);
     expect(ipfix.records[0].fields[1].value).to.equal(80);
 
   });
@@ -81,10 +81,10 @@ describe('Ipfix constructor', function(){
   it('should load templates from json', function(){
     expect(ipfix.templates).to.have.lengthOf(1);
     expect(ipfix.templates[0].fields[0].id).to.equal(32772);
-    expect(ipfix.templates[0].fields[0].eid).to.equal(20613);
+    expect(ipfix.templates[0].fields[0].eid).to.equal(20763);
     expect(ipfix.templates[0].fields[0].length).to.equal(2);
     expect(ipfix.templates[0].fields[1].id).to.equal(32773);
-    expect(ipfix.templates[0].fields[1].eid).to.equal(20613);
+    expect(ipfix.templates[0].fields[1].eid).to.equal(20763);
     expect(ipfix.templates[0].fields[1].length).to.equal(2);
 
   });
@@ -99,12 +99,12 @@ describe('Ipfix values exctractions', function(){
   it('should return all values corresponding to an information element', function(){
     var values = ipfix.getValues(InfoElem.PARENT);
     expect(values).to.have.lengthOf(1);
-    expect(values).to.include({'parent': 2});
+    expect(values).to.include({'parent': 2, exportTime: 596});
   });
 
   it('should return all values corresponding to multiple information elements', function(){
     var values = ipfix.getValues(InfoElem.PARENT, InfoElem.BATTERY);
     expect(values).to.have.lengthOf(1);
-    expect(values).to.include({'parent': 2, 'battery': 80});
+    expect(values).to.include({'parent': 2, 'battery': 80, exportTime: 596});
   });
 });

@@ -101,6 +101,7 @@ class Ipfix {
       }
 
       if(Object.keys(result).length == listInfoElem.length){
+        result.exportTime = this.exportTime;
         values.push(result);
       }
 
