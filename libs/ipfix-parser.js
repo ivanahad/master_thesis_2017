@@ -6,7 +6,7 @@ const HEADER_LENGTH = 16;
 var templatesStore = {};
 
 exports.parse = function(binaryBuffer){
-  const ipfixJson = parseToJson(binaryBuffer);
+  const ipfixJson = exports.parseToJson(binaryBuffer);
   return new Ipfix(ipfixJson);
 };
 
@@ -58,7 +58,6 @@ function updateTemplates(template, templateId, domainId){
 
 function parseMessage(buff){
   var ipfixJson = parseHeader(buff);
-
   buff = buff.slice(16);
   ipfixJson.sets = parseSets(buff, ipfixJson.domainId);
 
