@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "NODE_DEBUG=web,collector,db node ./bin/main",
+    "start": "NODE_DEBUG=web,collector,db,parser node ./bin/main",
     "test": "mocha tests --recursive"
   },
   "dependencies": {

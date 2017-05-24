@@ -1,4 +1,6 @@
 const Ipfix = require('./ipfix');
+const debuglog = require('util').debuglog('parser');
+
 var exports = module.exports = {};
 
 const HEADER_LENGTH = 16;
@@ -14,7 +16,7 @@ exports.parseToJson = function (binaryBuffer) {
   if(!binaryBuffer){
     throw new Error("Ipfix parsing: empty/undefined message");
   }
-
+  debuglog('Parsing to msg');
   const copyBuffer = Buffer.alloc(binaryBuffer.length);
   binaryBuffer.copy(copyBuffer);
   var ipfixJson = parseMessage(copyBuffer);
@@ -57,8 +59,10 @@ function updateTemplates(template, templateId, domainId){
 }
 
 function parseMessage(buff){
+  debuglog('Parsing header');
   var ipfixJson = parseHeader(buff);
   buff = buff.slice(16);
+  debuglog('Parsing sets');
   ipfixJson.sets = parseSets(buff, ipfixJson.domainId);
 
   return ipfixJson;
@@ -97,6 +101,7 @@ function parseSets(buff, domainId){
 }
 
 function parseTemplates(buff, domainId){
+  debuglog('Parsing templates');
   var offset = 0;
   var templates = [];
   while (offset < buff.length) {  // Templates
@@ -127,6 +132,7 @@ function parseTemplates(buff, domainId){
 }
 
 function parseData(buff, templateId, domainId){
+  debuglog('Parsing data/records');
   var records = [];
   var offset = 0;
   const template = getTemplate(domainId, templateId);
