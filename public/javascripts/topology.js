@@ -1,10 +1,10 @@
 //noinspection JSDuplicatedDeclaration
 var svg = d3.select("svg"),
     margin = {
-        top: 20,
-        right: 20,
-        bottom: 20,
-        left: 20
+        top: 5,
+        right: 100,
+        bottom: 5,
+        left: 5
     },
     width = +svg.attr("width") - margin.left - margin.right,
     height = +svg.attr("height") - margin.top - margin.bottom,
@@ -15,6 +15,7 @@ var svg = d3.select("svg"),
 // var canClickOnOthers = true;
 var links = [];
 var nodes = [];
+var rootnode;
 
 //Structure : ID, Parent, Battery
 function parseNodes(data){
@@ -22,10 +23,15 @@ function parseNodes(data){
         var IDd = d.ID.toString();
         var parentd = d.parent.toString();
         var batteryd = d.battery.toString();
+        var volumed = d.volume.toString();
         if(parentd!="none") {
             links.push({source: IDd, target: parentd});
         }
-        nodes[IDd] = {ID: IDd, parent: parentd, battery: batteryd};
+        if(parentd=="none") {
+            nodes[IDd] = {ID: IDd, parent: parentd, battery: batteryd, volume : volumed};
+            rootnode = {ID: IDd, parent: parentd, battery: batteryd, volume : volumed};
+        }
+        nodes[IDd] = {ID: IDd, parent: parentd, battery: batteryd, volume : volumed};
     });
 
     links.forEach(function(link) {
@@ -54,13 +60,15 @@ var aucunassign=true;
 // action to take on mouse click
 function click(node) {
     currentnodeid=node.ID;
+    var batt = parseInt(node.battery);
+
     if(numberClicked % 2 == 1 && aucunassign==true){ //node gets bigger
         numberClicked++;
         selectednodeid=currentnodeid;
         aucunassign=false;
         d3.select(this).select("text").transition()
             .duration(750)
-            .attr("x", 22)
+            .attr("x", 40)
             .style("fill", "steelblue")
             .style("stroke", "lightsteelblue")
             .style("stroke-width", ".5px")
@@ -73,20 +81,71 @@ function click(node) {
     }
     else if(numberClicked % 2 !=1 && aucunassign==false && selectednodeid==currentnodeid) {
         numberClicked++;
-        d3.select(this).select("circle").transition()
-            .duration(750)
-            .attr("r", 8)
-            .style("fill", "#ccc");
-        d3.select(this).select("text").transition()
-            .duration(750)
-            .attr("x", 12)
-            .style("stroke", "none")
-            .style("fill", "black")
-            .style("stroke", "none")
-            .style("font", "14px sans-serif");
-        removeNode();
-        aucunassign=true;
-        selectednodeid="";
+        if(node.parent == "none") {
+            d3.select(this).select("circle").transition()
+                .duration(750)
+                .attr("r", 15)
+                .style("fill", "#26b6cc");
+            d3.select(this).select("text").transition()
+                .duration(750)
+                .attr("x", 15)
+                .style("stroke", "none")
+                .style("fill", "black")
+                .style("stroke", "none")
+                .style("font", "14px sans-serif");
+            removeNode();
+            aucunassign = true;
+            selectednodeid = "";
+        }
+        else if (batt > 50 && node.parent!="none"){
+            d3.select(this).select("circle").transition()
+                .duration(750)
+                .attr("r", 8)
+                .style("fill", "#31cc18");
+            d3.select(this).select("text").transition()
+                .duration(750)
+                .attr("x", 12)
+                .style("stroke", "none")
+                .style("fill", "black")
+                .style("stroke", "none")
+                .style("font", "14px sans-serif");
+            removeNode();
+            aucunassign = true;
+            selectednodeid = "";
+        }
+
+        else if (batt <= 50 && batt > 20 && node.parent!="none"){
+            d3.select(this).select("circle").transition()
+                .duration(750)
+                .attr("r", 8)
+                .style("fill", "yellow");
+            d3.select(this).select("text").transition()
+                .duration(750)
+                .attr("x", 12)
+                .style("stroke", "none")
+                .style("fill", "black")
+                .style("stroke", "none")
+                .style("font", "14px sans-serif");
+            removeNode();
+            aucunassign = true;
+            selectednodeid = "";
+        }
+        else if (batt <= 20 && node.parent!="none"){
+            d3.select(this).select("circle").transition()
+                .duration(750)
+                .attr("r", 8)
+                .style("fill", "red");
+            d3.select(this).select("text").transition()
+                .duration(750)
+                .attr("x", 12)
+                .style("stroke", "none")
+                .style("fill", "black")
+                .style("stroke", "none")
+                .style("font", "14px sans-serif");
+            removeNode();
+            aucunassign = true;
+            selectednodeid = "";
+        }
 
     }
 }
@@ -96,6 +155,7 @@ function updateNode(node){
     document.getElementById("currentID").innerHTML = (node.ID).toString();
     document.getElementById("parent").innerHTML = (node.parent).toString();
     document.getElementById("battery").innerHTML = (node.battery).toString();
+    document.getElementById("volume").innerHTML = (node.volume).toString();
 
 }
 
@@ -103,18 +163,20 @@ function removeNode(){
     document.getElementById("currentID").innerHTML = "-";
     document.getElementById("parent").innerHTML = "-";
     document.getElementById("battery").innerHTML = "-" ;
+    document.getElementById("volume").innerHTML = "-" ;
 }
 
 var force;
 var link;
 var node;
 
+
 var drawTopology = function() {
     force = d3.layout.force()
         .nodes(d3.values(nodes))
         .links(links)
         .size([width, height])
-        .linkDistance(30)
+        .linkDistance(15)
         .charge(-300)
         .on("tick", tick)
         .start();
@@ -129,14 +191,39 @@ var drawTopology = function() {
         .enter().append("g")
         .attr("class", "node")
         .on("click", click)
+        .call(force.drag);
 
     node.append("circle")
-        .attr("r", 8);
+        .attr("r", function (d) { if(d.parent=="none") {
+            return 15;
+        }
+        else{
+            return 8;
+        }})
+        .style("fill", function (d) { if(d.parent == "none"){
+            return "#26b6cc";}
+
+            else if (d.parent != "none" && d.battery > 50){
+                return "#31cc18";
+        }
+        else if (d.parent != "none" && d.battery <= 50 && d.battery >20){
+                return "yellow";
+        }
+        else if (d.parent != "none" && d.battery <= 20){
+            return "red";
+        }
+    });
 
     node.append("text")
-        .attr("x", 12)
+        .attr("x", function (d) { if(d.parent=="none") {
+            return 15;
+        }
+        else{
+            return 12;
+        }})
         .attr("dy", ".35em")
         .text(function(d) { return d.ID; });
+    document.getElementById("rootID").innerHTML = (rootnode.ID).toString();
 };
 
 /*
@@ -158,7 +245,6 @@ function loadData() {
 }
 
 loadData();
-
 /*
  todo list :
 
@@ -201,108 +287,3 @@ loadData();
 //     });
 // }
 
-
-
-// path.enter().append("path")
-//     .attr("fill", function(d, i) { return color(i); })
-//     .attr("d", arc)
-//     .each(function(d) {this._current = d;} );
-//
-// path.transition()
-//     .attrTween("d", arcTween);
-//
-// path.exit().remove()
-
-
-
-
-
-
-
-// function mouseover() {
-//     d3.select(this).select("circle").transition()
-//         .duration(750)
-//         .attr("r", 16);
-// }
-//
-// function mouseout() {
-//     d3.select(this).select("circle").transition()
-//         .duration(750)
-//         .attr("r", 8);
-// }
-
-
-
-//Pour une eventuelle opacite sur les liens entre chaque noeud
-// links.forEach(function(link) {
-//     if (v(link.value) <= 25) {
-//         link.type = "twofive";
-//     } else if (v(link.value) <= 50 && v(link.value) > 25) {
-//         link.type = "fivezero";
-//     } else if (v(link.value) <= 75 && v(link.value) > 50) {
-//         link.type = "sevenfive";
-//     } else if (v(link.value) <= 100 && v(link.value) > 75) {
-//         link.type = "onezerozero";
-//     }
-// });
-
-// function parseLinks(data){
-//     data.forEach(function(d) {
-//         var sourced = d.source.toString();
-//         var targetd = d.target.toString();
-//         links.push({source : sourced, target : targetd})
-//
-//     });
-//     links.forEach(function(link){
-//         console.log("source : " + link.source + " target : " + link.target);
-//     });
-//     links.forEach(function(link) {
-//         link.source = nodes[link.source] || (nodes[link.source] = {name: link.source});
-//         link.target = nodes[link.target] || (nodes[link.target] = {name: link.target});
-//     });
-//     links.forEach(function(link){
-//         console.log("source : " + link.source + " target : " + link.target);
-//     });
-// }
-
-
-
-// function click(node) {
-//     currentnodeid=node.ID;
-//     if(selectedNodes==0) {
-//         d3.select(this).select("text").transition()
-//             .duration(750)
-//             .attr("x", 22)
-//             .style("fill", "steelblue")
-//             .style("stroke", "lightsteelblue")
-//             .style("stroke-width", ".5px")
-//             .style("font", "20px sans-serif");
-//         d3.select(this).select("circle").transition()
-//             .duration(750)
-//             .attr("r", 30)
-//             .style("fill", "lightsteelblue");
-//         updateNode(node);
-//         selectedNodes=1;
-//     }
-// }
-
-// action to take on mouse double click
-// function dblclick(node) {
-//
-//     if(selectedNodes==1 && node.ID==currentnodeid) {
-//         console.log(this);
-//         d3.select(this).select("circle").transition()
-//             .duration(750)
-//             .attr("r", 8)
-//             .style("fill", "#ccc");
-//         d3.select(this).select("text").transition()
-//             .duration(750)
-//             .attr("x", 12)
-//             .style("stroke", "none")
-//             .style("fill", "black")
-//             .style("stroke", "none")
-//             .style("font", "14px sans-serif");
-//         removeNode();
-//         selectedNodes = 0;
-//     }
-// }
