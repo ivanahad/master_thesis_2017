@@ -18,9 +18,9 @@ class Node {
     return this.getStatus("parent");
   }
 
-  addMessage(ipfixObj){
+  addMessage(ipfix){
     const limit = 5;
-    this.lastMessages.push(ipfixObj);
+    this.lastMessages.push(ipfix);
     if(this.lastMessages.length > 5){
       this.lastMessages.shift();
     }

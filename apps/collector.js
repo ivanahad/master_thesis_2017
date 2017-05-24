@@ -1,12 +1,13 @@
-#!/usr/bin/env node
 const dgram = require("dgram");
+const IpfixParser = require('../libs/ipfix-parser');
+const EventEmitter = require('events');
 const debuglog = require('util').debuglog('collector');
-const ipfix = require('../libs/ipfix');
-const DB = require('../libs/queries');
 
 const PORT = 9995;
-
 const udpserver = dgram.createSocket("udp6");
+
+class CollectorEmitter extends EventEmitter {}
+const collectorEmitter = new CollectorEmitter();
 
 udpserver.on("error", function (err) {
   debuglog("server error:\n" + err.stack);
@@ -15,12 +16,11 @@ udpserver.on("error", function (err) {
 
 udpserver.on("message", function (msg, rinfo) {
   var buf = new Buffer(msg, 'hex');
-  debuglog("Received msg from " +
-    rinfo.address + ":" + rinfo.port +
+  debuglog("Received msg from " + rinfo.address + ":" + rinfo.port +
     "( " + msg.length + " bytes)");
   try {
-    var ipfixObj = ipfix.parse(msg);
-    DB.logIpfix(ipfixObj);
+    var ipfix = IpfixParser.parse(msg);
+    collectorEmitter.emit('message', ipfix);
   } catch (e) {
     debuglog("Collector: problem when processing msg");
   }
@@ -28,8 +28,12 @@ udpserver.on("message", function (msg, rinfo) {
 
 udpserver.on("listening", function () {
   var address = udpserver.address();
-  debuglog("Collector listening " +
-      address.address + ":" + address.port);
+  debuglog("Collector listening " + address.address + ":" + address.port);
 });
 
-udpserver.bind(PORT);
+module.exports = {
+  startCollector : function(){
+    udpserver.bind(PORT);
+  },
+  collectorEmitter: collectorEmitter
+};
