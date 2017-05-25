@@ -52,6 +52,7 @@ class Node {
       const name = names[i];
       values[name] = this.getStatus(name);
     }
+    values.id = this.id;
     return values;
   }
 }

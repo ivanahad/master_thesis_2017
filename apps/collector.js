@@ -23,6 +23,7 @@ udpserver.on("message", function (msg, rinfo) {
     collectorEmitter.emit('message', ipfix);
   } catch (e) {
     debuglog("Collector: problem when processing msg");
+    console.error(e);
   }
 });
 

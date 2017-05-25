@@ -156,7 +156,7 @@ function parseData(buff, templateId, domainId){
 function parseValue(buff, length, offset){
   switch(length){
     case 1:
-      return buff.readUInt8BE(offset);
+      return buff.readUInt8(offset);
     case 2:
       return buff.readUInt16BE(offset);
     case 4:

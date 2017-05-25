@@ -20,10 +20,10 @@ var rootnode;
 //Structure : ID, Parent, Battery
 function parseNodes(data){
     data.forEach(function(d) {
-        var IDd = d.ID.toString();
+        var IDd = d.id.toString();
         var parentd = d.parent.toString();
         var batteryd = d.battery.toString();
-        var volumed = d.volume.toString();
+        var volumed = "1000";
         if(parentd!="none") {
             links.push({source: IDd, target: parentd});
         }
@@ -286,4 +286,3 @@ loadData();
 //
 //     });
 // }
-
