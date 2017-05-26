@@ -19,8 +19,20 @@ router.get('/network_traffic', function(req, res, next) {
 });
 
 router.get('/volumes', function(req, res, next){
-  Log.getLogs((volumes) => {
-    res.json(volumes);
+  Log.getLogs((objects) => {
+    var volumes = objects.reduce((a, b) => {
+      return a.concat(b.getValues(InfoElem.SOURCE_NODE_ID,
+        InfoElem.DESTINATION_NODE_ID, InfoElem.OCTET_DELTA_COUNT, InfoElem.PACKET_DELTA_COUNT));
+    }, []);
+    var ipfix = objects.reduce((a, b) => {
+      a.push({
+        exportTime: b.exportTime,
+        length: b.length,
+        domainId: b.domainId
+      });
+      return a;
+    }, []);
+    res.json({volumes: volumes, ipfix: ipfix});
   });
 });
 
