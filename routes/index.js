@@ -14,8 +14,13 @@ router.get('/topology', function(req, res, next) {
 });
 
 router.get('/network_traffic', function(req, res, next) {
+  res.render('network_traffic');
+
+});
+
+router.get('/volumes', function(req, res, next){
   Log.getLogs((volumes) => {
-    res.render('network_traffic', {data: JSON.stringify(volumes)});
+    res.json(volumes);
   });
 });
 

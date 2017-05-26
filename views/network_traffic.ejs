@@ -48,39 +48,24 @@
             </div>
             <!-- Chart -->
             <div class="row">
-                <div class="col-md-7">
+                <div class="col-md-12">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title"><i class="fa fa-area-chart"></i> Traffic chart</h3>
                         </div>
-                        <div class="panel-body" id="div_traffic" style="width:640px;height:360px;">
+                        <div class="panel-body" id="div_traffic" style="width:1024px;height:360px;">
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="col-md-5">
+            <div class='row'>
+                <div class="col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Statistics</h3>
                         </div>
-                        <div class="panel-body" id="div_stat" style="width:480px;height:360px;">
-                            <!-- <table class="table table-hover">
-                                <tr>
-                                  <th>Total</th>
-                                  <th>Average</th>
-                                  <th>Max</th>
-                                  <th>Min</th>
-                                  <th>Packets</th>
-                                </tr>
-                                <tr>
-                                  <td id="traffic_total">-</td>
-                                  <td id="traffic_average">-</td>
-                                  <td id="traffic_max">-</td>
-                                  <td id="traffic_min">-</td>
-                                  <td id="traffic_packets">-</td>
-                                </tr>
-                            </table> -->
-                        </div>
+                        <div class="panel-body" id="div_stat" style="width:360px;height:360px;"></div>
                     </div>
                 </div>
             </div>
@@ -89,38 +74,6 @@
     </div>
     <script src="/javascripts/plotly.min.js"></script>
     <script src="/javascripts/graphs.js"></script>
-    <script type="text/javascript">
-      const data = <%- data %>;
-
-      const minTime = Math.min.apply(null, data.map(function(x){ return x.exportTime; }));
-      const maxTime = Math.max.apply(null, data.map(function(x){ return x.exportTime; }));
-      var x = [];
-      const INTERVAL = 300; // 5 minutes
-      var startTime = Math.floor(minTime / INTERVAL) * INTERVAL;
-      var limitTime = Math.ceil(maxTime / INTERVAL) * INTERVAL;
-
-      for(var incrementedTime = startTime; incrementedTime < limitTime; incrementedTime += INTERVAL){
-        x.push(new Date(incrementedTime * 1000));
-      }
-
-      var numberInterval = x.length;
-      var y = Array(numberInterval).fill(0);
-      for(var i in data){
-        const volume = data[i];
-        const index = Math.floor((volume.exportTime - startTime) / INTERVAL);
-        y[index] += volume['octets'];
-      }
-
-      plotScatter(x, y, 'div_traffic');
-
-      const max = Math.max.apply(null, y);
-      const min = Math.min.apply(null, y);
-      const sum = y.reduce(function(a, b){ return a + b;}, 0);
-      const average = Math.floor(sum / y.length);
-      const packets = data.reduce(function(a, b){ return a + b["packets"];}, 0);
-
-      plotBar(["average", "max", "min"], [average, max, min] , 'div_stat');
-    </script>
 
 </body>
 
