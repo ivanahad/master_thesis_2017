@@ -20,6 +20,7 @@ var rootnode;
 //Structure : ID, Parent, Battery
 function parseNodes(data){
     data.forEach(function(d) {
+
         var IDd = d.ID.toString();
         var parentd;
         if(d.parent==null){
@@ -31,6 +32,16 @@ function parseNodes(data){
         var batteryd = d.battery.toString();
         var volumed = d.volume.toString();
         var lastsentd = d.lastsent.toString();
+
+      // console.log(d);
+      //   var IDd = d.id.toString();
+      //   if(d.parent === null || d.battery === null){
+      //     d.parent = "none";
+      //     d.battery = "none";
+      //   }
+      //   var parentd = d.parent.toString();
+      //   var batteryd = d.battery.toString();
+      //   var volumed = "1000";
         if(parentd!="none") {
             links.push({source: IDd, target: parentd});
         }
@@ -254,4 +265,3 @@ function loadData() {
 }
 
 loadData();
-

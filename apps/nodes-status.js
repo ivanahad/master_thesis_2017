@@ -32,22 +32,23 @@ class NodesStatus {
     var node = this.getOrCreate(ipfix.domainId);
     node.addMessage(ipfix);
 
-    this.updateStatus(ipfix.json, node, InfoElem.PARENT);
-    this.updateStatus(ipfix.json, node, InfoElem.BATTERY);
+    this.updateStatus(ipfix, node, InfoElem.PARENT);
+    this.updateStatus(ipfix, node, InfoElem.BATTERY);
   }
 
   updateStatus(ipfix, node, informationElement){
-    const records = IpfixParser.getRecords(ipfix);
-    for(var i in records){
-      const record = records[i];
-      for(var j in record){
-        const element = record[j];
-        if(element.id == informationElement.id){
-          node.updateStatus(informationElement.name, element.value);
-          return;
-        }
-      }
+    const values = ipfix.getValues(informationElement);
+    if(values.length > 0){
+      node.updateStatus(informationElement.name, values[0][informationElement.name]);
     }
+  }
+
+  getMultipleStatus(names){
+    var result = [];
+    for(var i in this.nodes){
+      result.push(this.nodes[i].getMultipleStatus(names));
+    }
+    return result;
   }
 
   clean (){
