@@ -20,23 +20,36 @@ var rootnode;
 //Structure : ID, Parent, Battery
 function parseNodes(data){
     data.forEach(function(d) {
-      console.log(d);
-        var IDd = d.id.toString();
-        if(d.parent === null || d.battery === null){
-          d.parent = "none";
-          d.battery = "none";
+
+        var IDd = d.ID.toString();
+        var parentd;
+        if(d.parent==null){
+            parentd = "none"
+        }else {
+            parentd = d.parent.toString();
         }
-        var parentd = d.parent.toString();
+
         var batteryd = d.battery.toString();
-        var volumed = "1000";
+        var volumed = d.volume.toString();
+        var lastsentd = d.lastsent.toString();
+
+      // console.log(d);
+      //   var IDd = d.id.toString();
+      //   if(d.parent === null || d.battery === null){
+      //     d.parent = "none";
+      //     d.battery = "none";
+      //   }
+      //   var parentd = d.parent.toString();
+      //   var batteryd = d.battery.toString();
+      //   var volumed = "1000";
         if(parentd!="none") {
             links.push({source: IDd, target: parentd});
         }
         if(parentd=="none") {
-            nodes[IDd] = {ID: IDd, parent: parentd, battery: batteryd, volume : volumed};
-            rootnode = {ID: IDd, parent: parentd, battery: batteryd, volume : volumed};
+            nodes[IDd] = {ID: IDd, parent: parentd, battery: batteryd, volume : volumed, lastsent: lastsentd};
+            rootnode = {ID: IDd, parent: parentd, battery: batteryd, volume : volumed, lastsent: lastsentd};
         }
-        nodes[IDd] = {ID: IDd, parent: parentd, battery: batteryd, volume : volumed};
+        nodes[IDd] = {ID: IDd, parent: parentd, battery: batteryd, volume : volumed, lastsent: lastsentd};
     });
 
     links.forEach(function(link) {
@@ -161,6 +174,7 @@ function updateNode(node){
     document.getElementById("parent").innerHTML = (node.parent).toString();
     document.getElementById("battery").innerHTML = (node.battery).toString();
     document.getElementById("volume").innerHTML = (node.volume).toString();
+    document.getElementById("lastsent").innerHTML = (node.lastsent).toString();
 
 }
 
@@ -169,6 +183,7 @@ function removeNode(){
     document.getElementById("parent").innerHTML = "-";
     document.getElementById("battery").innerHTML = "-" ;
     document.getElementById("volume").innerHTML = "-" ;
+    document.getElementById("lastsent").innerHTML = "-";
 }
 
 var force;
@@ -232,7 +247,7 @@ var drawTopology = function() {
 };
 
 /*
- Parse correctement les donnees, les nodes et les links sont bien initialisés. Mais les tableaux ne sont initialises que dans la fonction et pas en dehors.
+ Parse correctement les donnees, les nodes et les links sont bien initialisés.
  */
 function loadData() {
     var xhttp = new XMLHttpRequest();
@@ -250,44 +265,3 @@ function loadData() {
 }
 
 loadData();
-/*
- todo list :
-
- - Mettre à jour la topologie en fonction du flux de données reçu (!!!). chaque 5 minutes
- - changer les couleurs en fonction du dernier message
- - RDV 14h30 18 may
- - Modulability of the software
- */
-
-
-
-// ** Update data section (Called from the onclick)
-// function updateData() {
-//
-//     // Get the data again
-//     d3.csv("data-alt.csv", function(error, data) {
-//         data.forEach(function(d) {
-//             d.date = parseDate(d.date);
-//             d.close = +d.close;
-//         });
-//
-//         // Scale the range of the data again
-//         x.domain(d3.extent(data, function(d) { return d.date; }));
-//         y.domain([0, d3.max(data, function(d) { return d.close; })]);
-//
-//         // Select the section we want to apply our changes to
-//         var svg = d3.select("body").transition();
-//
-//         // Make the changes
-//         svg.select(".line")   // change the line
-//             .duration(750)
-//             .attr("d", valueline(data));
-//         svg.select(".x.axis") // change the x axis
-//             .duration(750)
-//             .call(xAxis);
-//         svg.select(".y.axis") // change the y axis
-//             .duration(750)
-//             .call(yAxis);
-//
-//     });
-// }
