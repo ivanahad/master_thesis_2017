@@ -38,7 +38,9 @@ class NodesStatus {
 
   updateStatus(ipfix, node, informationElement){
     const values = ipfix.getValues(informationElement);
-    node.updateStatus(informationElement.name, values[0][informationElement.name]);
+    if(values.length > 0){
+      node.updateStatus(informationElement.name, values[0][informationElement.name]);
+    }
   }
 
   getMultipleStatus(names){

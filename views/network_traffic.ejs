@@ -28,8 +28,9 @@
             <!-- Collect the nav links, forms, and other content for toggling -->
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="#">Traffic <span class="sr-only">(current)</span></a></li>
-                    <li><a href="/topology">Topology</a></li>
+                  <li><a href="/">Home</a></li>
+                  <li class="active"><a href="#">Traffic <span class="sr-only">(current)</span></a></li>
+                  <li><a href="/topology">Topology</a></li>
                 </ul>
             </div>
         </div>
@@ -39,7 +40,7 @@
         <div class="container-fluid">
             <!-- Page Heading -->
             <div class="row">
-                <div class="col-lg-12">
+                <div class="col-md-12">
                     <h1 class="page-header">
                         Traffic
                     </h1>
@@ -47,34 +48,38 @@
             </div>
             <!-- Chart -->
             <div class="row">
-                <div class="col-lg-8">
+                <div class="col-md-7">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title"><i class="fa fa-area-chart"></i> Traffic chart</h3>
                         </div>
-                        <div class="panel-body" id="div_traffic" style="width:720px;height:375px;">
+                        <div class="panel-body" id="div_traffic" style="width:640px;height:360px;">
                         </div>
                     </div>
                 </div>
 
-                <div class="col-lg-4">
+                <div class="col-md-5">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Statistics</h3>
                         </div>
-                        <div class="panel-body">
-                            <table class="table table-hover">
+                        <div class="panel-body" id="div_stat" style="width:480px;height:360px;">
+                            <!-- <table class="table table-hover">
                                 <tr>
-                                    <th> </th>
-                                    <th>Average</th>
-                                    <th>Max</th>
+                                  <th>Total</th>
+                                  <th>Average</th>
+                                  <th>Max</th>
+                                  <th>Min</th>
+                                  <th>Packets</th>
                                 </tr>
                                 <tr>
-                                    <td>Traffic</td>
-                                    <td id="traffic_average">-</td>
-                                    <td id="traffic_max">-</td>
+                                  <td id="traffic_total">-</td>
+                                  <td id="traffic_average">-</td>
+                                  <td id="traffic_max">-</td>
+                                  <td id="traffic_min">-</td>
+                                  <td id="traffic_packets">-</td>
                                 </tr>
-                            </table>
+                            </table> -->
                         </div>
                     </div>
                 </div>
@@ -86,27 +91,35 @@
     <script src="/javascripts/graphs.js"></script>
     <script type="text/javascript">
       const data = <%- data %>;
-      
+
+      const minTime = Math.min.apply(null, data.map(function(x){ return x.exportTime; }));
+      const maxTime = Math.max.apply(null, data.map(function(x){ return x.exportTime; }));
       var x = [];
-      var time = 0;
-      while(time < 60*60){
-        x.push(new Date(time * 1000));
-        time = time + 60;
+      const INTERVAL = 300; // 5 minutes
+      var startTime = Math.floor(minTime / INTERVAL) * INTERVAL;
+      var limitTime = Math.ceil(maxTime / INTERVAL) * INTERVAL;
+
+      for(var incrementedTime = startTime; incrementedTime < limitTime; incrementedTime += INTERVAL){
+        x.push(new Date(incrementedTime * 1000));
       }
 
-      var y = Array(60).fill(0);
+      var numberInterval = x.length;
+      var y = Array(numberInterval).fill(0);
       for(var i in data){
         const volume = data[i];
-        const index = Math.floor(volume.exportTime / 60) % 60;
+        const index = Math.floor((volume.exportTime - startTime) / INTERVAL);
         y[index] += volume['octets'];
       }
 
-      plotTraffic(x, y, 'div_traffic');
-      var max = Math.max.apply(null, y);
-      var sum = y.reduce(function(a, b){ return a + b;}, 0);
-      document.getElementById('traffic_average').innerHTML = Math.floor(sum / y.length);
-      document.getElementById('traffic_max').innerHTML = max;
+      plotScatter(x, y, 'div_traffic');
 
+      const max = Math.max.apply(null, y);
+      const min = Math.min.apply(null, y);
+      const sum = y.reduce(function(a, b){ return a + b;}, 0);
+      const average = Math.floor(sum / y.length);
+      const packets = data.reduce(function(a, b){ return a + b["packets"];}, 0);
+
+      plotBar(["average", "max", "min"], [average, max, min] , 'div_stat');
     </script>
 
 </body>

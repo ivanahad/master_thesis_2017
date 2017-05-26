@@ -33,7 +33,7 @@ getLogs = function(callback){
       });
       var volumes = objects.reduce((a, b) => {
         return a.concat(b.getValues(InfoElem.SOURCE_NODE_ID,
-          InfoElem.DESTINATION_NODE_ID, InfoElem.OCTET_DELTA_COUNT));
+          InfoElem.DESTINATION_NODE_ID, InfoElem.OCTET_DELTA_COUNT, InfoElem.PACKET_DELTA_COUNT));
       }, []);
       callback(volumes);
     })

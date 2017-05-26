@@ -20,7 +20,12 @@ var rootnode;
 //Structure : ID, Parent, Battery
 function parseNodes(data){
     data.forEach(function(d) {
+      console.log(d);
         var IDd = d.id.toString();
+        if(d.parent === null || d.battery === null){
+          d.parent = "none";
+          d.battery = "none";
+        }
         var parentd = d.parent.toString();
         var batteryd = d.battery.toString();
         var volumed = "1000";
