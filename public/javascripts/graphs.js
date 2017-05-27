@@ -16,14 +16,23 @@ function addResizeProp(div) {
   });
 }
 
-function plotTraffic(x, y, divId) {
+function plotTraffic(x, y, z, divId) {
   const div = document.getElementById(divId);
-  var trace = {
+  var traceAll = {
     type: 'scatter',
     x: x,
     y: y,
+    name: "All",
     fill: 'tozeroy'
   };
+
+  var traceIpfix = {
+    type: 'scatter',
+    x: x,
+    y: z,
+    name: "Ipfix",
+  };
+
 
   var layout = {
     height: 0.9 * div.clientHeight,
@@ -35,7 +44,7 @@ function plotTraffic(x, y, divId) {
     }
   };
 
-  Plotly.newPlot(divId, [trace], layout, {
+  Plotly.newPlot(divId, [traceAll, traceIpfix], layout, {
     displaylogo: false
   });
 
@@ -83,18 +92,25 @@ function drawGraphs(data) {
   const limitTime = Math.ceil(maxTime / INTERVAL) * INTERVAL;
 
   var x = [];
-  for (var incrementedTime = startTime; incrementedTime < limitTime; incrementedTime += INTERVAL) {
+  for (let incrementedTime = startTime; incrementedTime < limitTime; incrementedTime += INTERVAL) {
     x.push(new Date(incrementedTime * 1000));
   }
 
   var y = Array(x.length).fill(0);
-  for (var i in data.volumes) {
+  for (let i in data.volumes) {
     const volume = data.volumes[i];
     const index = Math.floor((volume.exportTime - startTime) / INTERVAL);
     y[index] += volume.octets;
   }
 
-  plotTraffic(x, y, 'div_traffic');
+  var z = Array(x.length).fill(0);
+  for(let i in data.ipfix) {
+    const volumeIpfix = data.ipfix[i];
+    const index = Math.floor((volumeIpfix.exportTime - startTime) / INTERVAL);
+    z[index] += volumeIpfix.length;
+  }
+
+  plotTraffic(x, y, z, 'div_traffic');
 
   const max = Math.max.apply(null, y);
   const min = Math.min.apply(null, y);
