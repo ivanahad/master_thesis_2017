@@ -22,7 +22,7 @@ function plotTraffic(x, y, z, divId) {
     type: 'scatter',
     x: x,
     y: y,
-    name: "All",
+    name: "Other",
     fill: 'tozeroy'
   };
 
@@ -80,6 +80,21 @@ function plotStats(x, y, divId) {
   addResizeProp(div);
 }
 
+function plotReparition(labels, values, divId){
+  const div = document.getElementById(divId);
+  var data = [{
+    values: values,
+    labels: labels,
+    type: 'pie'
+  }];
+
+  var layout = {
+    height: 0.9 * div.clientHeight
+  };
+
+  Plotly.newPlot(divId, data, layout, {staticPlot: true});
+}
+
 function drawGraphs(data) {
   const INTERVAL = 300; // 5 minutes
   const minTime = Math.min.apply(null, data.volumes.map(function(x) {
@@ -96,18 +111,18 @@ function drawGraphs(data) {
     x.push(new Date(incrementedTime * 1000));
   }
 
-  var y = Array(x.length).fill(0);
-  for (let i in data.volumes) {
-    const volume = data.volumes[i];
-    const index = Math.floor((volume.exportTime - startTime) / INTERVAL);
-    y[index] += volume.octets;
-  }
-
   var z = Array(x.length).fill(0);
   for(let i in data.ipfix) {
     const volumeIpfix = data.ipfix[i];
     const index = Math.floor((volumeIpfix.exportTime - startTime) / INTERVAL);
     z[index] += volumeIpfix.length;
+  }
+
+  var y = z.map(function(x){ return -x;});
+  for (let i in data.volumes) {
+    const volume = data.volumes[i];
+    const index = Math.floor((volume.exportTime - startTime) / INTERVAL);
+    y[index] += volume.octets;
   }
 
   plotTraffic(x, y, z, 'div_traffic');
@@ -126,6 +141,13 @@ function drawGraphs(data) {
   }, 0);
 
   plotStats(["average", "max", "min"], [average, max, min], 'div_stat');
+
+
+  const totalBroadcast = data.volumes
+    .filter(function(x){ return x.dst_node == 26;})
+    .reduce(function(a, b){ return a + b.octets;}, 0);
+
+  plotReparition(["ipfix", "broadcast", "unicast"], [sumIpfix, totalBroadcast, sum - sumIpfix - totalBroadcast], "div_repartition");
 
   document.getElementById('summary_total').innerHTML = sum + " Bytes";
   document.getElementById('summary_packets').innerHTML = packets;
