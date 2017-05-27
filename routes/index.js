@@ -18,6 +18,10 @@ router.get('/network_traffic', function(req, res, next) {
 
 });
 
+router.get('/node/:nodeId', function(req, res, next) {
+  res.render('node');
+});
+
 router.get('/volumes', function(req, res, next){
   Log.getLogs((objects) => {
     var volumes = objects.reduce((a, b) => {
@@ -34,6 +38,21 @@ router.get('/volumes', function(req, res, next){
     }, []);
     res.json({volumes: volumes, ipfix: ipfix});
   });
+});
+
+router.get('node_status/:nodeId', function(req, res, next) {
+  const nodeId = req.parameters.nodeId;
+  const node = NodesStatus.get(nodeId);
+  if(node === null){
+    res.json({});
+  }
+  const result = {
+    id: node.id,
+    lastUpdate: node.lastUpdate,
+    lastMessages: node.lastMessages,
+    status: node.status
+  };
+  res.json(result);
 });
 
 router.get('/nodes_data', function(req, res, next) {

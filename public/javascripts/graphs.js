@@ -70,7 +70,8 @@ function plotStats(x, y, divId) {
     },
     yaxis: {
       title: 'Bytes'
-    }
+    },
+    title: "without ipfix"
   };
 
   Plotly.newPlot(divId, [trace], layout, {
@@ -93,6 +94,7 @@ function plotReparition(labels, values, divId){
   };
 
   Plotly.newPlot(divId, data, layout, {staticPlot: true});
+  addResizeProp(div);
 }
 
 function drawGraphs(data) {
