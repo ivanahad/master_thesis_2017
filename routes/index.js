@@ -6,7 +6,20 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', {});
+  Log.getLogs((objects) => {
+    const volumes = objects.reduce((a, b) => {
+      return a.concat(b.getValues(InfoElem.SOURCE_NODE_ID,
+        InfoElem.DESTINATION_NODE_ID, InfoElem.OCTET_DELTA_COUNT, InfoElem.PACKET_DELTA_COUNT));
+    }, []);
+    const totalVolume = volumes.reduce((a, b) => {
+      return a + b.octets;
+    }, 0);
+    const packets = volumes.reduce((a,b) => {
+      return a + b.packets;
+    }, 0);
+    const numberNodes = NodesStatus.getNumberNodes();
+    res.render('index', {numberNodes: numberNodes, volume: totalVolume, packets: packets});
+  });
 });
 
 router.get('/topology', function(req, res, next) {
