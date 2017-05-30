@@ -18,11 +18,11 @@ router.get('/network_traffic', function(req, res, next) {
 
 });
 
-router.get('/volumes', function(req, res, next){
-  Log.getLogs((volumes) => {
-    res.json(volumes);
-  });
-});
+// router.get('/volumes', function(req, res, next){
+//   Log.getLogs((volumes) => {
+//     res.json(volumes);
+//   });
+// });
 
 router.get('/nodes_data', function(req, res, next) {
     res.setHeader('Content-Type', 'application/json');
@@ -97,7 +97,7 @@ router.get('/nodes_data', function(req, res, next) {
     //     {ID : "72", parent : "30", battery : "15", volume : "1000", lastsent : 2},
     // ];
     var data = NodesStatus.getMultipleStatus([InfoElem.PARENT.name, InfoElem.BATTERY.name]);
-
+f
     res.send(JSON.stringify(data));
 });
 
