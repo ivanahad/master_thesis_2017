@@ -2,67 +2,104 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <title>IoT monitoring</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
-    <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <meta charset="utf-8">
+  <title>IoT monitoring</title>
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+  <link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
-    <!-- Navigation bar -->
-    <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+  <!-- Navigation bar -->
+  <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                   <span class="sr-only">Toggle navigation</span>
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
                 </button>
-                <p class="navbar-text">IoT monitoring</p>
-            </div>
+        <p class="navbar-text">IoT monitoring</p>
+      </div>
 
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="#">Home <span class="sr-only">(current)</span></a></li>
-                    <li><a href="/network_traffic">Traffic</a></li>
-                    <li><a href="/topology">Topology</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li class="active"><a href="#">Home <span class="sr-only">(current)</span></a></li>
+          <li><a href="/network_traffic">Traffic</a></li>
+          <li><a href="/topology">Topology</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
 
-    <div id="page-wrapper">
-        <div class="container-fluid">
-            <!-- Page Heading -->
-            <div class="row">
-                <div class="col-lg-12">
-                    <h1 class="page-header">
-                        Traffic
+  <div id="page-wrapper">
+    <div class="container-fluid">
+      <!-- Page Heading -->
+      <div class="row">
+        <div class="col-md-12">
+          <h1 class="page-header">
+                        Home
                     </h1>
+        </div>
+      </div>
+      <!-- Chart -->
+      <div class="row">
+
+        <div class="col-md-3">
+          <div class="panel panel-primary">
+            <div class="panel-heading">
+              <div class="row">
+                <div class="col-xs-3">
+                  <i class="fa fa-circle fa-5x"></i>
                 </div>
-            </div>
-            <!-- Chart -->
-            <div class="row">
-                <div class="col-lg-8">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title"><i class="fa fa-area-chart"></i> Traffic chart</h3>
-                        </div>
-
-                    </div>
+                <div class="col-xs-9 text-right">
+                  <h1><%= numberNodes %></h1>
+                  <div>Active Motes</div>
                 </div>
-
-
+              </div>
             </div>
+            <a href="/topology">
+              <div class="panel-footer">
+                <span class="pull-left">View Details</span>
+                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                <div class="clearfix"></div>
+              </div>
+            </a>
+          </div>
         </div>
 
+        <div class="col-md-3">
+          <div class="panel panel-success">
+            <div class="panel-heading">
+              <div class="row">
+                <div class="col-xs-3">
+                  <i class="fa fa-area-chart fa-5x"></i>
+                </div>
+                <div class="col-xs-9 text-right">
+                  <h1><%= volume %> Bytes</h1>
+                  <div>For <%= packets %> packets</div>
+                </div>
+              </div>
+            </div>
+            <a href="/network_traffic">
+              <div class="panel-footer">
+                <span class="pull-left">View Details</span>
+                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+                <div class="clearfix"></div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-    <script src="/javascripts/jquery-3.2.0.min.js"></script>
-    <script src="//d3js.org/d3.v4.min.js"></script>
+  </div>
+
+  <script src="/javascripts/jquery-3.2.0.min.js"></script>
+  <script src="//d3js.org/d3.v4.min.js"></script>
 </body>
 
 </html>

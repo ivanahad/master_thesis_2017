@@ -2,78 +2,158 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <title>IoT monitoring</title>
+  <meta charset="utf-8">
+  <title>IoT monitoring</title>
 
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
-    <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+  <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
 
 </head>
 
 <body>
-    <!-- Navigation bar -->
-    <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+  <!-- Navigation bar -->
+  <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+    <div class="container-fluid">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
                   <span class="sr-only">Toggle navigation</span>
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
                 </button>
-                <p class="navbar-text">IoT monitoring</p>
-            </div>
+        <p class="navbar-text">IoT monitoring</p>
+      </div>
 
-            <!-- Collect the nav links, forms, and other content for toggling -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                  <li><a href="/">Home</a></li>
-                  <li class="active"><a href="#">Traffic <span class="sr-only">(current)</span></a></li>
-                  <li><a href="/topology">Topology</a></li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <div id="page-wrapper">
-        <div class="container-fluid">
-            <!-- Page Heading -->
-            <div class="row">
-                <div class="col-md-12">
-                    <h1 class="page-header">
-                        Traffic
-                    </h1>
-                </div>
-            </div>
-            <!-- Chart -->
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title"><i class="fa fa-area-chart"></i> Traffic chart</h3>
-                        </div>
-                        <div class="panel-body" id="div_traffic" style="width:90%;height:360px;">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class='row'>
-                <div class="col-md-4">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Statistics</h3>
-                        </div>
-                        <div class="panel-body" id="div_stat" style="width:90%;height:360px;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav">
+          <li><a href="/">Home</a></li>
+          <li class="active"><a href="#">Traffic <span class="sr-only">(current)</span></a></li>
+          <li><a href="/topology">Topology</a></li>
+        </ul>
+      </div>
     </div>
-    <script src="/javascripts/plotly.min.js"></script>
-    <script src="/javascripts/graphs.js"></script>
+  </nav>
+
+  <div id="page-wrapper">
+    <div class="container-fluid">
+      <!-- Page Heading -->
+      <div class="row">
+        <div class="col-md-12">
+          <h1 class="page-header">
+                        Traffic
+          </h1>
+        </div>
+      </div>
+      <!-- Chart -->
+      <div class="row">
+        <div class="col-md-8">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title"><i class="fa fa-area-chart"></i> Traffic chart</h3>
+            </div>
+            <div class="panel-body" id="div_traffic" style="width:90%;height:360px;">
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="panel panel-default">
+            <div class="panel-heading">Summary</div>
+
+            <!-- Table -->
+            <table class="table table-striped table-condensed table-hover">
+              <tr>
+                <th>All</th>
+                <th></th>
+                <th></th>
+              </tr>
+              <tr>
+                <td></td>
+                <td><strong>Total</strong></td>
+                <td id="summary_total">-</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td><strong>Packets</strong></td>
+                <td id="summary_packets">-</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td><strong>Average packet size</strong></td>
+                <td id="summary_average_packet_size">-</td>
+              </tr>
+
+              <tr>
+                <th>Ipfix</th>
+                <th></th>
+                <th></th>
+              </tr>
+              <tr>
+                <td></td>
+                <td><strong>Total</strong></td>
+                <td id="summary_ipfix_total">-</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td><strong>Packets</strong></td>
+                <td id="summary_ipfix_packets">-</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td><strong>Average packet size</strong></td>
+                <td id="summary_ipfix_average_packet_size">-</td>
+              </tr>
+
+              <tr>
+                <th>Others</th>
+                <th></th>
+                <th></th>
+              </tr>
+              <tr>
+                <td></td>
+                <td><strong>Total</strong></td>
+                <td id="summary_other_total">-</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td><strong>Packets</strong></td>
+                <td id="summary_other_packets">-</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td><strong>Average packet size</strong></td>
+                <td id="summary_other_average_packet_size">-</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class='row'>
+        <div class="col-md-4">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Statistics</h3>
+            </div>
+            <div class="panel-body" id="div_stat" style="width:90%;height:360px;"></div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Repartition</h3>
+            </div>
+            <div class="panel-body" id="div_repartition" style="width:90%;height:360px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <script src="/javascripts/plotly.min.js"></script>
+  <script src="/javascripts/graphs.js"></script>
 
 </body>
 

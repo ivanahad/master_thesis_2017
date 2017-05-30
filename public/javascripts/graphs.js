@@ -10,23 +10,32 @@ function loadVolumes() {
   xhttp.send();
 }
 
-function addResizeProp(divId){
-  const div = document.getElementById(divId);
-  window.onresize = function(){
+function addResizeProp(div) {
+  window.addEventListener("resize", function() {
     Plotly.Plots.resize(div);
-  };
+  });
 }
 
-function plotTraffic(x, y, divId) {
-  var trace = {
+function plotTraffic(x, y, z, divId) {
+  const div = document.getElementById(divId);
+  var traceAll = {
     type: 'scatter',
     x: x,
     y: y,
+    name: "Other",
     fill: 'tozeroy'
   };
 
-  var layout = {
+  var traceIpfix = {
+    type: 'scatter',
+    x: x,
+    y: z,
+    name: "Ipfix",
+  };
 
+
+  var layout = {
+    height: 0.9 * div.clientHeight,
     xaxis: {
       showgrid: false
     },
@@ -35,14 +44,15 @@ function plotTraffic(x, y, divId) {
     }
   };
 
-  Plotly.newPlot(divId, [trace], layout, {
+  Plotly.newPlot(divId, [traceAll, traceIpfix], layout, {
     displaylogo: false
   });
 
-  addResizeProp(divId);
+  addResizeProp(div);
 }
 
 function plotStats(x, y, divId) {
+  const div = document.getElementById(divId);
   var trace = {
     type: 'bar',
     x: x,
@@ -54,45 +64,70 @@ function plotStats(x, y, divId) {
   };
 
   var layout = {
+    height: 0.9 * div.clientHeight,
     xaxis: {
       showgrid: false
     },
     yaxis: {
       title: 'Bytes'
-    }
+    },
+    title: "without ipfix"
   };
 
   Plotly.newPlot(divId, [trace], layout, {
     displayModeBar: false
   });
 
-  addResizeProp(divId);
+  addResizeProp(div);
+}
+
+function plotReparition(labels, values, divId){
+  const div = document.getElementById(divId);
+  var data = [{
+    values: values,
+    labels: labels,
+    type: 'pie'
+  }];
+
+  var layout = {
+    height: 0.9 * div.clientHeight
+  };
+
+  Plotly.newPlot(divId, data, layout, {staticPlot: true});
+  addResizeProp(div);
 }
 
 function drawGraphs(data) {
   const INTERVAL = 300; // 5 minutes
-  const minTime = Math.min.apply(null, data.map(function(x) {
+  const minTime = Math.min.apply(null, data.volumes.map(function(x) {
     return x.exportTime;
   }));
-  const maxTime = Math.max.apply(null, data.map(function(x) {
+  const maxTime = Math.max.apply(null, data.volumes.map(function(x) {
     return x.exportTime;
   }));
   const startTime = Math.floor(minTime / INTERVAL) * INTERVAL;
   const limitTime = Math.ceil(maxTime / INTERVAL) * INTERVAL;
 
   var x = [];
-  for (var incrementedTime = startTime; incrementedTime < limitTime; incrementedTime += INTERVAL) {
+  for (let incrementedTime = startTime; incrementedTime < limitTime; incrementedTime += INTERVAL) {
     x.push(new Date(incrementedTime * 1000));
   }
 
-  var y = Array(x.length).fill(0);
-  for (var i in data) {
-    const volume = data[i];
+  var z = Array(x.length).fill(0);
+  for(let i in data.ipfix) {
+    const volumeIpfix = data.ipfix[i];
+    const index = Math.floor((volumeIpfix.exportTime - startTime) / INTERVAL);
+    z[index] += volumeIpfix.length;
+  }
+
+  var y = z.map(function(x){ return -x;});
+  for (let i in data.volumes) {
+    const volume = data.volumes[i];
     const index = Math.floor((volume.exportTime - startTime) / INTERVAL);
     y[index] += volume.octets;
   }
 
-  plotTraffic(x, y, 'div_traffic');
+  plotTraffic(x, y, z, 'div_traffic');
 
   const max = Math.max.apply(null, y);
   const min = Math.min.apply(null, y);
@@ -100,11 +135,33 @@ function drawGraphs(data) {
     return a + b;
   }, 0);
   const average = Math.floor(sum / y.length);
-  const packets = data.reduce(function(a, b) {
+  const packets = data.volumes.reduce(function(a, b) {
     return a + b.packets;
+  }, 0);
+  const sumIpfix = data.ipfix.reduce(function(a, b) {
+    return a + b.length;
   }, 0);
 
   plotStats(["average", "max", "min"], [average, max, min], 'div_stat');
+
+
+  const totalBroadcast = data.volumes
+    .filter(function(x){ return x.dst_node == 26;})
+    .reduce(function(a, b){ return a + b.octets;}, 0);
+
+  plotReparition(["ipfix", "broadcast", "unicast"], [sumIpfix, totalBroadcast, sum - sumIpfix - totalBroadcast], "div_repartition");
+
+  document.getElementById('summary_total').innerHTML = sum + " Bytes";
+  document.getElementById('summary_packets').innerHTML = packets;
+  document.getElementById("summary_average_packet_size").innerHTML = Math.floor(sum / packets) + " Bytes";
+
+  document.getElementById("summary_ipfix_total").innerHTML = sumIpfix + " Bytes";
+  document.getElementById("summary_ipfix_packets").innerHTML = data.ipfix.length;
+  document.getElementById("summary_ipfix_average_packet_size").innerHTML = Math.floor(sumIpfix / data.ipfix.length) + " Bytes";
+
+  document.getElementById("summary_other_total").innerHTML = (sum - sumIpfix) + " Bytes";
+  document.getElementById("summary_other_packets").innerHTML = (packets - data.ipfix.length);
+  document.getElementById("summary_other_average_packet_size").innerHTML = Math.floor((sum - sumIpfix) / (packets - data.ipfix.length)) + " Bytes";
 }
 
 loadVolumes();

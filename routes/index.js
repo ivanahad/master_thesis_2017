@@ -6,7 +6,20 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', {});
+  Log.getLogs((objects) => {
+    const volumes = objects.reduce((a, b) => {
+      return a.concat(b.getValues(InfoElem.SOURCE_NODE_ID,
+        InfoElem.DESTINATION_NODE_ID, InfoElem.OCTET_DELTA_COUNT, InfoElem.PACKET_DELTA_COUNT));
+    }, []);
+    const totalVolume = volumes.reduce((a, b) => {
+      return a + b.octets;
+    }, 0);
+    const packets = volumes.reduce((a,b) => {
+      return a + b.packets;
+    }, 0);
+    const numberNodes = NodesStatus.getNumberNodes();
+    res.render('index', {numberNodes: numberNodes, volume: totalVolume, packets: packets});
+  });
 });
 
 router.get('/topology', function(req, res, next) {
@@ -18,11 +31,42 @@ router.get('/network_traffic', function(req, res, next) {
 
 });
 
-// router.get('/volumes', function(req, res, next){
-//   Log.getLogs((volumes) => {
-//     res.json(volumes);
-//   });
-// });
+router.get('/node/:nodeId', function(req, res, next) {
+  res.render('node');
+});
+
+router.get('/volumes', function(req, res, next){
+  Log.getLogs((objects) => {
+    var volumes = objects.reduce((a, b) => {
+      return a.concat(b.getValues(InfoElem.SOURCE_NODE_ID,
+        InfoElem.DESTINATION_NODE_ID, InfoElem.OCTET_DELTA_COUNT, InfoElem.PACKET_DELTA_COUNT));
+    }, []);
+    var ipfix = objects.reduce((a, b) => {
+      a.push({
+        exportTime: b.exportTime,
+        length: b.length,
+        domainId: b.domainId
+      });
+      return a;
+    }, []);
+    res.json({volumes: volumes, ipfix: ipfix});
+  });
+});
+
+router.get('node_status/:nodeId', function(req, res, next) {
+  const nodeId = req.parameters.nodeId;
+  const node = NodesStatus.get(nodeId);
+  if(node === null){
+    res.json({});
+  }
+  const result = {
+    id: node.id,
+    lastUpdate: node.lastUpdate,
+    lastMessages: node.lastMessages,
+    status: node.status
+  };
+  res.json(result);
+});
 
 router.get('/nodes_data', function(req, res, next) {
     res.setHeader('Content-Type', 'application/json');

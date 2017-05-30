@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>IoT monitoring</title>
+
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
+  <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+</head>
+
+<body>
+    <!-- Navigation bar -->
+    <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </button>
+                <p class="navbar-text">IoT monitoring</p>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/network_traffic">Traffic</a></li>
+                    <li><a href="/topology">Topology</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="page-wrapper">
+        <div class="container-fluid">
+            <!-- Page Heading -->
+            <div class="row">
+                <div class="col-md-12">
+                    <h1 class="page-header">
+                        Node
+                    </h1>
+                </div>
+            </div>
+            <!-- Chart -->
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="fa fa-area-chart"></i>Summary</h3>
+                        </div>
+
+                          <table class="table table-hover table-striped">
+                            <tr>
+                              <th>Id</th>
+                              <td>1</td>
+                            </tr>
+                            <tr>
+                              <th>Parent</th>
+                              <td>2</td>
+                            </tr>
+
+                            <tr>
+                              <th>Battery</th>
+                              <td>80 %</td>
+                            </tr>
+
+                            <tr>
+                              <th>Last message</th>
+                              <td>5 march</td>
+                            </tr>
+                          </table>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="fa fa-area-chart"></i>Last flows</h3>
+                        </div>
+
+                        <div class="panel-body">
+                          <div class="row">
+
+                            <div class="col-md-4">
+                              <table class="table table-hover table-striped table-bordered" id="table_flows">
+                                <tr>
+                                  <th>Destination</th>
+                                  <th>Bytes</th>
+                                  <th>Packets</th>
+                                </tr>
+                              </table>
+                            </div>
+
+                            <div class="col-md-8" id="div_flows">
+
+                            </div>
+
+                          </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-8">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"><i class="fa fa-area-chart"></i>Last Messages</h3>
+                    </div>
+                </div>
+              </div>
+            </div>
+
+
+        </div>
+
+    </div>
+
+    <script src="/javascripts/plotly.min.js"></script>
+</body>
+
+</html>

@@ -42,6 +42,11 @@ describe('Nodes status', function(){
     Nodes.feedIpfix(new Ipfix(data1));
     expect(Nodes.getNodes()).to.have.keys('1');
   });
+  it('should return the correct number of nodes', function(){
+    expect(Nodes.getNumberNodes()).to.equal(0);
+    Nodes.feedIpfix(new Ipfix(data1));
+    expect(Nodes.getNumberNodes()).to.equal(1);
+  });
   it('should return null when not finding specific node', function(){
     expect(Nodes.get(1)).to.be.null;
   });

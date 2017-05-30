@@ -12,6 +12,10 @@ class NodesStatus {
     return this.nodes;
   }
 
+  getNumberNodes(){
+    return Object.keys(this.nodes).length;
+  }
+
   get(nodeId){
     if(!(nodeId in this.nodes)){
       return null;
