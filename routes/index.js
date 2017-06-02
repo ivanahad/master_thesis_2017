@@ -53,16 +53,21 @@ router.get('/volumes', function(req, res, next){
   });
 });
 
-router.get('node_status/:nodeId', function(req, res, next) {
-  const nodeId = req.parameters.nodeId;
+router.get('/node_status/:nodeId', function(req, res, next) {
+  const nodeId = req.params.nodeId;
   const node = NodesStatus.get(nodeId);
   if(node === null){
     res.json({});
   }
+  console.log(node.lastMessages);
   const result = {
     id: node.id,
     lastUpdate: node.lastUpdate,
-    lastMessages: node.lastMessages,
+    lastMessages: node.lastMessages.map((a) => {return a.json;}),
+    volumes: node.lastMessages.reduce((a, b) => {
+       return a.concat(b.getValues(InfoElem.SOURCE_NODE_ID,
+         InfoElem.DESTINATION_NODE_ID, InfoElem.OCTET_DELTA_COUNT, InfoElem.PACKET_DELTA_COUNT));
+     }, []),
     status: node.status
   };
   res.json(result);

@@ -53,6 +53,7 @@ class Node {
       values[name] = this.getStatus(name);
     }
     values.id = this.id;
+    values.lastUpdate = this.lastUpdate;
     return values;
   }
 }

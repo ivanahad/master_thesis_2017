@@ -20,18 +20,17 @@ var rootnode;
 //Structure : ID, Parent, Battery
 function parseNodes(data){
     data.forEach(function(d) {
-
-        var IDd = d.ID.toString();
+        var IDd = d.id.toString();
         var parentd;
-        if(d.parent==null){
-            parentd = "none"
+        if(d.parent === null){
+            parentd = "none";
         }else {
             parentd = d.parent.toString();
         }
 
         var batteryd = d.battery.toString();
-        var volumed = d.volume.toString();
-        var lastsentd = d.lastsent.toString();
+        var volumed ="100";
+        var lastsentd = new Date(d.lastUpdate * 1000);
 
       // console.log(d);
       //   var IDd = d.id.toString();
@@ -45,8 +44,8 @@ function parseNodes(data){
         if(parentd!="none") {
             links.push({source: IDd, target: parentd});
         }
-        if(parentd=="none") {
-            nodes[IDd] = {ID: IDd, parent: parentd, battery: batteryd, volume : volumed, lastsent: lastsentd};
+        if(parentd==="0") {
+            parentd = "none";
             rootnode = {ID: IDd, parent: parentd, battery: batteryd, volume : volumed, lastsent: lastsentd};
         }
         nodes[IDd] = {ID: IDd, parent: parentd, battery: batteryd, volume : volumed, lastsent: lastsentd};

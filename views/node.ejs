@@ -7,7 +7,7 @@
 
   <link rel='stylesheet' href='/stylesheets/style.css' />
   <link rel="stylesheet" href="/stylesheets/bootstrap.min.css">
-  <link rel="stylesheet" href="font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
 </head>
 
 <body>
@@ -56,21 +56,21 @@
                           <table class="table table-hover table-striped">
                             <tr>
                               <th>Id</th>
-                              <td>1</td>
+                              <td id="summary_id">-</td>
                             </tr>
                             <tr>
                               <th>Parent</th>
-                              <td>2</td>
+                              <td id="summary_parent">-</td>
                             </tr>
 
                             <tr>
                               <th>Battery</th>
-                              <td>80 %</td>
+                              <td id="summary_battery">-</td>
                             </tr>
 
                             <tr>
                               <th>Last message</th>
-                              <td>5 march</td>
+                              <td id="summary_last_message">-</td>
                             </tr>
                           </table>
 
@@ -79,7 +79,7 @@
             </div>
 
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title"><i class="fa fa-area-chart"></i>Last flows</h3>
@@ -94,6 +94,7 @@
                                   <th>Destination</th>
                                   <th>Bytes</th>
                                   <th>Packets</th>
+                                  <th>Export Time</th>
                                 </tr>
                               </table>
                             </div>
@@ -107,16 +108,21 @@
 
                     </div>
                 </div>
+
+                <div class="col-md-8">
+                  <div class="panel panel-default">
+                      <div class="panel-heading">
+                          <h3 class="panel-title"><i class="fa fa-area-chart"></i>Last Messages</h3>
+                      </div>
+                      <table class="table" id="table_messages">
+
+                      </table>
+                  </div>
+                </div>
             </div>
 
             <div class="row">
-              <div class="col-md-8">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <h3 class="panel-title"><i class="fa fa-area-chart"></i>Last Messages</h3>
-                    </div>
-                </div>
-              </div>
+
             </div>
 
 
@@ -125,6 +131,7 @@
     </div>
 
     <script src="/javascripts/plotly.min.js"></script>
+    <script src="/javascripts/node.js"></script>
 </body>
 
 </html>
