@@ -3,6 +3,7 @@ const NodesStatus = require("./apps/nodes-status").instance;
 
 function fillData(){
   var node1 = new Node(1);
+  node1.lastUpdate = 6598421;
   node1.status = {
     battery: 85,
     flows: [{src_node: 1, dst_node: 2, octets: 87, packets: 1}]
@@ -16,6 +17,7 @@ function fillData(){
   };
 
   var node3 = new Node(3);
+  node3.lastUpdate = 150000;
   node3.status = {
     battery: 24,
     parent: 2,

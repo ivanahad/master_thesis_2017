@@ -23,8 +23,7 @@ function parseNodes(data) {
       ID: IDd,
       parent: parentd,
       battery: d.battery,
-      volume: "100",
-      lastsent: new Date(d.lastUpdate * 1000)
+      lastsent: d.lastUpdate ? (new Date(d.lastUpdate * 1000)).toLocaleString() : null
     };
 
     if (parentd) {
@@ -71,7 +70,6 @@ function tick() {
 }
 
 var selectednodeid = null;
-
 // action to take on mouse click
 function click(node) {
   var currentnodeid = node.ID;
@@ -91,11 +89,11 @@ function click(node) {
       .attr("r", 30)
       .style("fill", "lightsteelblue");
     updateNode(node);
-  } else if (selectednodeid == currentnodeid) {
+  }
+  else if (selectednodeid == currentnodeid) {
     d3.select(this).select("circle").transition()
       .duration(750)
       .attr("r", function(d) {
-        console.log(d);
         return d.parent ? 8 : 15;
       })
       .style("fill", function(d) {
@@ -128,7 +126,6 @@ function updateNode(node) {
   document.getElementById("currentID").innerHTML = node.ID;
   document.getElementById("parent").innerHTML = node.parent;
   document.getElementById("battery").innerHTML = node.battery;
-  document.getElementById("volume").innerHTML = node.volume;
   document.getElementById("lastsent").innerHTML = node.lastsent;
 
 }
@@ -137,17 +134,15 @@ function removeNode() {
   document.getElementById("currentID").innerHTML = "-";
   document.getElementById("parent").innerHTML = "-";
   document.getElementById("battery").innerHTML = "-";
-  document.getElementById("volume").innerHTML = "-";
   document.getElementById("lastsent").innerHTML = "-";
 }
 
-var force;
 var link;
 var node;
 
 
 var drawTopology = function() {
-  force = d3.layout.force()
+  var force = d3.layout.force()
     .nodes(d3.values(nodes))
     .links(links)
     .size([width, height])
@@ -194,15 +189,52 @@ var drawTopology = function() {
     });
 };
 
-/*
- Parse correctement les donnees, les nodes et les links sont bien initialisés.
- */
+function computeMinBattery(data){
+  return data.reduce(function(minBattery, n){
+    return n.battery !== null && minBattery > n.battery ? n.battery : minBattery;
+  }, 100);
+}
+
+function computeMaxBattery(data){
+  return data.reduce(function(maxBattery, n){
+    return n.battery !== null && maxBattery < n.battery ? n.battery : maxBattery;
+  }, 0);
+}
+
+function computeAverageBattery(data){
+  var sumBattery = 0;
+  var numberNodes = 0;
+  for(let i = 0; i < data.length; i++){
+    if(data[i].battery === null){
+      continue;
+    }
+    sumBattery += data[i].battery;
+    numberNodes++;
+  }
+  return numberNodes !== 0 ? sumBattery / numberNodes : 0;
+}
+
+function computeDepth(data){
+  return 0;
+}
+
+
+function computeStats(data){
+  const minBattery = computeMinBattery(data);
+  const maxBattery = computeMaxBattery(data);
+  const averageBattery = computeAverageBattery(data);
+  const numberNodes = data.length;
+  const depth = computeDepth(data);
+  console.log(depth);
+}
+
 function loadData() {
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       var data = JSON.parse(this.responseText);
       parseNodes(data);
+      computeStats(data);
       drawTopology();
     }
   };
