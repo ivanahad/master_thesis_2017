@@ -3,9 +3,12 @@ const Web = require('../apps/web');
 const Collector = require('../apps/collector');
 const DB = require('../apps/dblog');
 const Nodes = require('../apps/nodes-status');
+const Data = require('../data');
 
 
 Web.startHttpServer();
 Collector.startCollector();
 DB.startLogging();
 Nodes.startNodes();
+
+Data.fillData();
