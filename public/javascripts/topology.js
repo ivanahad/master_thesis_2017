@@ -32,15 +32,6 @@ function parseNodes(data){
         var volumed ="100";
         var lastsentd = new Date(d.lastUpdate * 1000);
 
-      // console.log(d);
-      //   var IDd = d.id.toString();
-      //   if(d.parent === null || d.battery === null){
-      //     d.parent = "none";
-      //     d.battery = "none";
-      //   }
-      //   var parentd = d.parent.toString();
-      //   var batteryd = d.battery.toString();
-      //   var volumed = "1000";
         if(parentd!="none") {
             links.push({source: IDd, target: parentd});
         }
@@ -253,12 +244,10 @@ function loadData() {
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             var data = JSON.parse(this.responseText);
-            // parseLinks(data);
             parseNodes(data);
             drawTopology();
         }
     };
-    // xhttp.open("GET", "/nodes_link", true);
     xhttp.open("GET", "/nodes_data", true);
     xhttp.send();
 }

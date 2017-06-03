@@ -10,14 +10,6 @@ class Node {
     return this.id;
   }
 
-  setParent(parentId){
-    this.updateStatus("parent", parentId);
-  }
-
-  getParent(){
-    return this.getStatus("parent");
-  }
-
   addMessage(ipfix){
     const limit = 5;
     this.lastMessages.push(ipfix);

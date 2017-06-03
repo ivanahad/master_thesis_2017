@@ -64,10 +64,6 @@ router.get('/node_status/:nodeId', function(req, res, next) {
     id: node.id,
     lastUpdate: node.lastUpdate,
     lastMessages: node.lastMessages.map((a) => {return a.json;}),
-    volumes: node.lastMessages.reduce((a, b) => {
-       return a.concat(b.getValues(InfoElem.SOURCE_NODE_ID,
-         InfoElem.DESTINATION_NODE_ID, InfoElem.OCTET_DELTA_COUNT, InfoElem.PACKET_DELTA_COUNT));
-     }, []),
     status: node.status
   };
   res.json(result);
