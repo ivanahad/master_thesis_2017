@@ -142,7 +142,7 @@ router.get('/nodes_data', function(req, res, next) {
     //     {ID : "72", parent : "30", battery : "15", volume : "1000", lastsent : 2},
     // ];
     var data = NodesStatus.getMultipleStatus([InfoElem.PARENT.name, InfoElem.BATTERY.name]);
-
+f
     res.send(JSON.stringify(data));
 });
 
