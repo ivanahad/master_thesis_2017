@@ -71,7 +71,7 @@ router.get('/node_status/:nodeId', function(req, res, next) {
 
 router.get('/nodes_data', function(req, res, next) {
     res.setHeader('Content-Type', 'application/json');
-    var data = NodesStatus.getMultipleStatus([InfoElem.PARENT.name, InfoElem.BATTERY.name]);
+    var data = NodesStatus.getMultipleStatus([InfoElem.PARENT.name, InfoElem.BATTERY.name, "flows"]);
 
     res.send(JSON.stringify(data));
 });

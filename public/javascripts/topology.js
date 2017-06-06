@@ -215,7 +215,33 @@ function computeAverageBattery(data){
 }
 
 function computeDepth(data){
-  return 0;
+  var parents = data.reduce(function(acc, value){
+    acc[value.id] = value.parent;
+    return acc;
+  }, {});
+  depths = {};
+  for(let i = 0; i < data.length; i++){
+    let currentNodeId = data[i].id;
+    let currentDepth = 0;
+    if(currentNodeId in depths){
+      continue;
+    }
+    let currentParent = currentNodeId;
+    while (parents[currentParent] !== null) {
+      if(currentParent in depths){
+        currentDepth = 1 + depths[currentParent];
+        break;
+      }
+      currentDepth++;
+      currentParent = parents[currentParent];
+    }
+    depths[currentNodeId] = currentDepth;
+  }
+  return depths;
+}
+
+function computeLinks(data){
+
 }
 
 
@@ -225,7 +251,8 @@ function computeStats(data){
   const averageBattery = computeAverageBattery(data);
   const numberNodes = data.length;
   const depth = computeDepth(data);
-  console.log(depth);
+  const links = computeLinks(data);
+  console.log(dlinks);
 }
 
 function loadData() {
