@@ -38,11 +38,23 @@ function fillData(){
     ]
   };
 
+  var node5 = new Node(5);
+  node5.status = {
+    battery: 97,
+    parent: 4,
+    flows: [
+      {src_node: 5, dst_node: 0, octets: 167, packets: 2},
+      {src_node: 5, dst_node: 1, octets: 254, packets: 5},
+      {src_node: 5, dst_node: 3, octets: 589, packets: 14}
+    ]
+  };
+
   NodesStatus.nodes = {
     1: node1,
     2: node2,
     3: node3,
-    4: node4
+    4: node4,
+    5: node5
   };
 }
 

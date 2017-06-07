@@ -15,24 +15,19 @@ var nodes = [];
 var rootnode;
 
 function parseNodes(data) {
+  const routingTraffic = computeRoutingTraffic(data);
   data.forEach(function(d) {
-    const IDd = d.id;
-    const parentd = d.parent;
+    d.lastUpdate = d.lastUpdate ? (new Date(d.lastUpdate * 1000)).toLocaleString() : null;
+    d.routing = routingTraffic[d.id] ? routingTraffic[d.id] : {octets: 0, packets : 0};
+    nodes[d.id] = d;
 
-    nodes[IDd] = {
-      ID: IDd,
-      parent: parentd,
-      battery: d.battery,
-      lastsent: d.lastUpdate ? (new Date(d.lastUpdate * 1000)).toLocaleString() : null
-    };
-
-    if (parentd) {
+    if (d.parent) {
       links.push({
-        source: IDd,
-        target: parentd
+        source: d.id,
+        target: d.parent
       });
     } else {
-      rootnode = nodes[IDd];
+      rootnode = nodes[d.id];
     }
 
   });
@@ -72,7 +67,7 @@ function tick() {
 var selectednodeid = null;
 // action to take on mouse click
 function click(node) {
-  var currentnodeid = node.ID;
+  var currentnodeid = node.id;
   var batt = parseInt(node.battery);
 
   if (selectednodeid === null) { //node gets bigger
@@ -123,10 +118,10 @@ function click(node) {
 
 
 function updateNode(node) {
-  document.getElementById("currentID").innerHTML = node.ID;
+  document.getElementById("currentID").innerHTML = node.id;
   document.getElementById("parent").innerHTML = node.parent;
   document.getElementById("battery").innerHTML = node.battery;
-  document.getElementById("lastsent").innerHTML = node.lastsent;
+  document.getElementById("lastsent").innerHTML = node.lastUpdate;
 
 }
 
@@ -185,7 +180,7 @@ var drawTopology = function() {
     })
     .attr("dy", ".35em")
     .text(function(d) {
-      return d.ID;
+      return d.id;
     });
 };
 
@@ -240,8 +235,74 @@ function computeDepth(data){
   return depths;
 }
 
-function computeLinks(data){
+function computePath(src, dst, parents){
+  const srcToGateway = computePathToGateway(src, parents);
+  const dstToGateway = computePathToGateway(dst, parents);
 
+  if(dstToGateway.includes(src)){ // dst is a child of scr
+    const index = dstToGateway.indexOf(src);
+    return dstToGateway.slice(0, index + 1).reverse();
+  }
+  else if(srcToGateway.includes(dst)){  // src is a child of dst
+    const index = srcToGateway.indexOf(dst);
+    return srcToGateway.slice(0, index + 1);
+  }
+  const indexSrc = srcToGateway.findIndex(function(element){
+    return dstToGateway.includes(element);
+  });
+  const indexDst = dstToGateway.indexOf(srcToGateway[indexSrc]);
+  return srcToGateway.slice(0, indexSrc + 1).concat(dstToGateway.slice(0, indexDst).reverse());
+}
+
+function computePathToGateway(src, parents){
+  const path = [src];
+  var currentNode = parents[src];
+  while(currentNode !== null){
+    path.push(currentNode);
+    currentNode = parents[currentNode];
+  }
+  return path;
+}
+
+function computeRoutingTraffic(data){
+  const parents = data.reduce(function(acc, value){
+    acc[value.id] = value.parent;
+    return acc;
+  }, {});
+
+  var routing = {};
+  var nodesRoutingTraffic = {};
+
+  for(let i = 0; i < data.length; i++){
+    for(let j = 0; j < data[i].flows.length; j++){
+      const flow = data[i].flows[j];
+      if(flow.src_node === 0 || flow.dst_node === 0){
+        continue;
+      }
+      if(!(flow.src_node in routing && flow.dst_node in routing[flow.src_node])){
+        const path = computePath(flow.src_node, flow.dst_node, parents);
+        if(!(flow.src_node in routing)){
+          routing[flow.src_node] = {};
+        }
+        if(!(flow.dst_node in routing)){
+          routing[flow.dst_node] = {};
+        }
+        routing[flow.src_node][flow.dst_node] = path;
+        routing[flow.dst_node][flow.src_node] = path.reverse();
+      }
+
+      const routingPath = routing[flow.src_node][flow.dst_node];
+      for(let k = 1; k < routingPath.length - 1; k++){
+        const nodeId = routingPath[k];
+        if(!(nodeId in nodesRoutingTraffic)){
+          nodesRoutingTraffic[nodeId] = {octets: 0, packets: 0};
+        }
+        nodesRoutingTraffic[nodeId].octets += flow.octets;
+        nodesRoutingTraffic[nodeId].packets += flow.packets;
+      }
+    }
+  }
+  return nodesRoutingTraffic;
 }
 
 
@@ -251,8 +312,6 @@ function computeStats(data){
   const averageBattery = computeAverageBattery(data);
   const numberNodes = data.length;
   const depth = computeDepth(data);
-  const links = computeLinks(data);
-  console.log(dlinks);
 }
 
 function loadData() {
