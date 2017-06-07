@@ -21,6 +21,13 @@ function parseNodes(data) {
     d.routing = routingTraffic[d.id] ? routingTraffic[d.id] : {octets: 0, packets : 0};
     nodes[d.id] = d;
 
+    const total = d.flows.reduce(function(acc, value){
+      acc.octets += value.octets;
+      acc.packets += value.packets;
+      return acc;
+    }, {octets: 0, packets: 0});
+    d.total = total;
+
     if (d.parent) {
       links.push({
         source: d.id,
@@ -89,7 +96,8 @@ function click(node) {
     d3.select(this).select("circle").transition()
       .duration(750)
       .attr("r", function(d) {
-        return d.parent ? 8 : 15;
+        const size = 8 + Math.floor((d.total.octets + d.routing.octets) / 200);
+        return size <= 20 ? size : 20;
       })
       .style("fill", function(d) {
         if (!d.parent) {
@@ -141,7 +149,7 @@ var drawTopology = function() {
     .nodes(d3.values(nodes))
     .links(links)
     .size([width, height])
-    .linkDistance(15)
+    .distance(50)
     .charge(-300)
     .on("tick", tick)
     .start();
@@ -160,7 +168,8 @@ var drawTopology = function() {
 
   node.append("circle")
     .attr("r", function(d) {
-      return d.parent ? 8 : 15;
+      const size = 8 + Math.floor((d.total.octets + d.routing.octets) / 200);
+      return size <= 20 ? size : 20;
     })
     .style("fill", function(d) {
       if (!d.parent) {
