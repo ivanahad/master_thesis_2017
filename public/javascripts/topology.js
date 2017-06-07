@@ -126,7 +126,7 @@ function click(node) {
 
 
 function updateNode(node) {
-  document.getElementById("currentID").innerHTML = node.id;
+  $("#currentID").html(node.id);
   document.getElementById("parent").innerHTML = node.parent;
   document.getElementById("battery").innerHTML = node.battery;
   document.getElementById("lastsent").innerHTML = node.lastUpdate;
@@ -139,6 +139,8 @@ function updateNode(node) {
     row.insertCell(2).innerHTML = node.flows[i].packets;
   }
 
+  $("#total_node").html(node.total.octets.toString() + " bytes ( "+ node.total.packets +")" );
+  $("#total_node_routed").html(node.routing.octets.toString() + " bytes ( "+ node.routing.packets +")" );
 }
 
 function removeNode() {
@@ -152,6 +154,9 @@ function removeNode() {
   for(let i = 1; i < tableLength; i++){
     tableFlows.deleteRow(1);
   }
+
+  $("#total_node").html("-");
+  $("#total_node_routed").html("-");
 }
 
 var link;
@@ -328,13 +333,33 @@ function computeRoutingTraffic(data){
   return nodesRoutingTraffic;
 }
 
-
 function computeStats(data){
   const minBattery = computeMinBattery(data);
   const maxBattery = computeMaxBattery(data);
   const averageBattery = computeAverageBattery(data);
   const numberNodes = data.length;
   const depth = computeDepth(data);
+  var maxDepth = 0;
+
+  const keys = Object.keys(depth);
+  for(let i in keys){
+    const key = keys[i];
+    if (depth[key] > maxDepth){
+      maxDepth = depth[key];
+    }
+  }
+  const totalBytes = nodes.reduce(function(acc, value){
+    return acc + value.total.octets;
+  }, 0);
+  const totalPackets = nodes.reduce(function(acc, value){
+    return acc + value.total.packets;
+  }, 0);
+
+  document.getElementById("number_nodes").innerHTML = numberNodes;
+  document.getElementById("maximum_depth").innerHTML = maxDepth;
+  document.getElementById("min_battery").innerHTML = minBattery;
+  document.getElementById("total_bytes").innerHTML = totalBytes.toString() + " bytes ( " + totalPackets +" )";
+
 }
 
 function loadData() {
