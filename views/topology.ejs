@@ -62,7 +62,7 @@
                 <div class="col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Selected Node</h3>
+                            <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Summary</h3>
                         </div>
                             <table class="table table-hover">
                                 <tr>
@@ -78,6 +78,18 @@
                                     <td id="parent">-</td>
                                     <td id="battery">-</td>
                                     <td id="lastsent">-</td>
+                                </tr>
+                            </table>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Flows</h3>
+                        </div>
+                            <table class="table table-hover" id="table_flows">
+                                <tr>
+                                    <th>Dst</th>
+                                    <th>Bytes</th>
+                                    <th>Packets</th>
                                 </tr>
                             </table>
                     </div>

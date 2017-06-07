@@ -131,6 +131,14 @@ function updateNode(node) {
   document.getElementById("battery").innerHTML = node.battery;
   document.getElementById("lastsent").innerHTML = node.lastUpdate;
 
+  const tableFlows = document.getElementById('table_flows');
+  for(let i in node.flows){
+    const row = tableFlows.insertRow(-1);
+    row.insertCell(0).innerHTML = node.flows[i].dst_node === 0 ? "broadcast" : node.flows[i].dst_node;
+    row.insertCell(1).innerHTML = node.flows[i].octets;
+    row.insertCell(2).innerHTML = node.flows[i].packets;
+  }
+
 }
 
 function removeNode() {
@@ -138,6 +146,12 @@ function removeNode() {
   document.getElementById("parent").innerHTML = "-";
   document.getElementById("battery").innerHTML = "-";
   document.getElementById("lastsent").innerHTML = "-";
+
+  const tableFlows = document.getElementById('table_flows');
+  const tableLength = tableFlows.rows.length;
+  for(let i = 1; i < tableLength; i++){
+    tableFlows.deleteRow(1);
+  }
 }
 
 var link;
