@@ -18,7 +18,7 @@ function parseNodes(data) {
   const routingTraffic = computeRoutingTraffic(data);
   data.forEach(function(d) {
     d.lastUpdate = d.lastUpdate ? (new Date(d.lastUpdate * 1000)).toLocaleString() : null;
-    d.routing = routingTraffic[d.id] ? routingTraffic[d.id] : {octets: 0, packets : 0};
+    d.routing = routingTraffic.nodes[d.id] ? routingTraffic.nodes[d.id] : {octets: 0, packets : 0};
     nodes[d.id] = d;
 
     const total = d.flows.reduce(function(acc, value){
@@ -40,6 +40,12 @@ function parseNodes(data) {
   });
 
   links.forEach(function(link) {
+    if(link.source in routingTraffic.links && link.target in routingTraffic.links[link.source]){
+      link.traffic = routingTraffic.links[link.source][link.target];
+    }
+    else{
+      link.traffic = {octets: 0, packets : 0};
+    }
     link.source = nodes[link.source] || (nodes[link.source] = {
       name: link.source
     });
@@ -127,9 +133,9 @@ function click(node) {
 
 function updateNode(node) {
   $("#currentID").html(node.id);
-  document.getElementById("parent").innerHTML = node.parent;
-  document.getElementById("battery").innerHTML = node.battery;
-  document.getElementById("lastsent").innerHTML = node.lastUpdate;
+  $("#parent").html(node.parent);
+  $("#battery").html(node.battery);
+  $("#lastsent").html(node.lastUpdate);
 
   const tableFlows = document.getElementById('table_flows');
   for(let i in node.flows){
@@ -144,10 +150,10 @@ function updateNode(node) {
 }
 
 function removeNode() {
-  document.getElementById("currentID").innerHTML = "-";
-  document.getElementById("parent").innerHTML = "-";
-  document.getElementById("battery").innerHTML = "-";
-  document.getElementById("lastsent").innerHTML = "-";
+  $("#currentID").html("-");
+  $("#parent").html("-");
+  $("#battery").html("-");
+  $("#lastsent").html("-");
 
   const tableFlows = document.getElementById('table_flows');
   const tableLength = tableFlows.rows.length;
@@ -168,7 +174,7 @@ var drawTopology = function() {
     .nodes(d3.values(nodes))
     .links(links)
     .size([width, height])
-    .distance(50)
+    .distance(70)
     .charge(-300)
     .on("tick", tick)
     .start();
@@ -176,7 +182,11 @@ var drawTopology = function() {
   link = svg.selectAll(".link")
     .data(force.links())
     .enter().append("line")
-    .attr("class", "link");
+    .attr("class", "link")
+    .style("stroke-width", function(link){
+      const width = 1 + Math.floor(link.traffic.octets / 200);
+      return width <= 10 ? width : 10;
+    });
 
   node = svg.selectAll(".node")
     .data(force.nodes())
@@ -300,6 +310,7 @@ function computeRoutingTraffic(data){
 
   var routing = {};
   var nodesRoutingTraffic = {};
+  var linksRouting = {};
 
   for(let i = 0; i < data.length; i++){
     for(let j = 0; j < data[i].flows.length; j++){
@@ -328,9 +339,30 @@ function computeRoutingTraffic(data){
         nodesRoutingTraffic[nodeId].octets += flow.octets;
         nodesRoutingTraffic[nodeId].packets += flow.packets;
       }
+
+      for(let k = 0; k < routingPath.length - 1; k++){
+        const src = routingPath[k];
+        const dst = routingPath[k+1];
+        if(!(src in linksRouting)){
+          linksRouting[src] = {};
+        }
+        if(!(dst in linksRouting)){
+          linksRouting[dst] = {};
+        }
+        if(!(dst in linksRouting[src])){
+          linksRouting[src][dst] = {octets: 0, packets: 0};
+        }
+        if(!(src in linksRouting[dst])){
+          linksRouting[dst][src] = {octets: 0, packets: 0};
+        }
+        linksRouting[src][dst].octets += flow.octets;
+        linksRouting[src][dst].packets += flow.packets;
+        linksRouting[dst][src].octets += flow.octets;
+        linksRouting[dst][src].packets += flow.packets;
+      }
     }
   }
-  return nodesRoutingTraffic;
+  return {nodes: nodesRoutingTraffic, links: linksRouting};
 }
 
 function computeStats(data){
