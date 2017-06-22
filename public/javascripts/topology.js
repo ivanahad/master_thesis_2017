@@ -126,7 +126,7 @@ function click(node) {
     d3.select(this).select("text").transition()
       .duration(750)
       .attr("x", function(d) {
-        return d.parent ? 12 : 15;
+        return -2;
       })
       .style("stroke", "none")
       .style("fill", "black")
@@ -235,7 +235,7 @@ var drawTopology = function() {
 
   node.append("text")
     .attr("x", function(d) {
-      return d.parent ? 12 : 15;
+      return -2;
     })
     .attr("dy", ".35em")
     .text(function(d) {
