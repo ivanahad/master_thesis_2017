@@ -1,3 +1,5 @@
+const InfoElem = require('../libs/informationElements');
+
 const TEMPLATE_SET_ID = 2;
 
 class Ipfix {
@@ -10,6 +12,38 @@ class Ipfix {
     this.templates = Ipfix.loadTemplatesFromJson(ipfixJson);
     this.records = Ipfix.loadRecordsFromJson(ipfixJson);
     this.json = ipfixJson;
+  }
+
+  addTemplate(template){
+    this.templates.push(template);
+  }
+
+  addRecord(record){
+    this.data.push(record);
+  }
+
+  getValues(){
+    var listInfoElem = arguments;
+    var values = [];
+    for(var i in this.records){
+      const record = this.records[i];
+
+      var result = {};
+      for(var j in record.fields){
+        const field = record.fields[j];
+        const infoElem = Ipfix.matchInfoElements(listInfoElem, field);
+        if(infoElem !== null){
+          result[infoElem.name] = field.value;
+        }
+      }
+
+      if(Object.keys(result).length == listInfoElem.length){
+        result.exportTime = this.exportTime;
+        values.push(result);
+      }
+
+    }
+    return values;
   }
 
   static loadTemplatesFromJson(ipfixJson){
@@ -59,54 +93,6 @@ class Ipfix {
       }
     }
     return records;
-  }
-
-  setLength(length){
-    this.length = length;
-  }
-
-  setExportTime(exportTime){
-    this.exportTime = exportTime;
-  }
-
-  setSeqNo(seqNo){
-    this.seqNo = seqNo;
-  }
-
-  setDomainId(domainId){
-    this.domainId = domainId;
-  }
-
-  addTemplate(template){
-    this.templates.push(template);
-  }
-
-  addRecord(record){
-    this.data.push(record);
-  }
-
-  getValues(){
-    var listInfoElem = arguments;
-    var values = [];
-    for(var i in this.records){
-      const record = this.records[i];
-
-      var result = {};
-      for(var j in record.fields){
-        const field = record.fields[j];
-        const infoElem = Ipfix.matchInfoElements(listInfoElem, field);
-        if(infoElem !== null){
-          result[infoElem.name] = field.value;
-        }
-      }
-
-      if(Object.keys(result).length == listInfoElem.length){
-        result.exportTime = this.exportTime;
-        values.push(result);
-      }
-
-    }
-    return values;
   }
 
   static matchInfoElements(listInfoElem, field){

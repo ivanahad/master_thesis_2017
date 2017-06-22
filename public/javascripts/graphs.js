@@ -97,6 +97,55 @@ function plotReparition(labels, values, divId){
   addResizeProp(div);
 }
 
+function getTopSenders(data){
+  var senders = {};
+  for(let i in data.ipfix){
+    const volumeIpfix = data.ipfix[i];
+    if(!(volumeIpfix.domainId in senders)){
+      senders[volumeIpfix.domainId] = 0;
+    }
+    senders[volumeIpfix.domainId] -= volumeIpfix.length;
+  }
+  for(let i in data.volumes){
+    const volume = data.volumes[i];
+    if(!(volume.src_node in senders)){
+      senders[volume.src_node] = 0;
+    }
+    senders[volume.src_node] += volume.octets;
+  }
+
+  var topSenders = Object.keys(senders).sort((a, b) => {
+    return senders[b] - senders[a];
+  })
+  .slice(0, 5)
+  .map((a) => {
+    return {id: a, volume: senders[a]};
+  });
+
+  return topSenders;
+}
+
+function getTopReceivers(data){
+  var receivers = {};
+  for(let i in data.volumes){
+    const volume = data.volumes[i];
+    if(!(volume.dst_node in receivers)){
+      receivers[volume.dst_node] = 0;
+    }
+    receivers[volume.dst_node] += volume.octets;
+  }
+
+  var topReceivers = Object.keys(receivers).sort((a, b) => {
+    return receivers[b] - receivers[a];
+  })
+  .slice(0, 5)
+  .map((a) => {
+    return {id: a, volume: receivers[a]};
+  });
+
+  return topReceivers;
+}
+
 function drawGraphs(data) {
   const INTERVAL = 300; // 5 minutes
   const minTime = Math.min.apply(null, data.volumes.map(function(x) {
@@ -151,6 +200,8 @@ function drawGraphs(data) {
 
   plotReparition(["ipfix", "broadcast", "unicast"], [sumIpfix, totalBroadcast, sum - sumIpfix - totalBroadcast], "div_repartition");
 
+
+
   document.getElementById('summary_total').innerHTML = sum + " Bytes";
   document.getElementById('summary_packets').innerHTML = packets;
   document.getElementById("summary_average_packet_size").innerHTML = Math.floor(sum / packets) + " Bytes";
@@ -162,6 +213,27 @@ function drawGraphs(data) {
   document.getElementById("summary_other_total").innerHTML = (sum - sumIpfix) + " Bytes";
   document.getElementById("summary_other_packets").innerHTML = (packets - data.ipfix.length);
   document.getElementById("summary_other_average_packet_size").innerHTML = Math.floor((sum - sumIpfix) / (packets - data.ipfix.length)) + " Bytes";
+
+  const topSenders = getTopSenders(data);
+  const topReceivers = getTopReceivers(data);
+
+  const tableSender = document.getElementById('table_sender');
+  for(let i in topSenders){
+    const row = tableSender.insertRow(-1);
+    row.insertCell(0).innerHTML = topSenders[i].id;
+    row.insertCell(1).innerHTML = topSenders[i].volume;
+  }
+
+  const tableReceiver = document.getElementById('table_receiver');
+  for(let i in topReceivers){
+    const row = tableReceiver.insertRow(-1);
+    var id = topReceivers[i].id;
+    if(id == "26"){
+      id = "broadcast";
+    }
+    row.insertCell(0).innerHTML = id;
+    row.insertCell(1).innerHTML = topReceivers[i].volume;
+  }
 }
 
 loadVolumes();

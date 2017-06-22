@@ -36,7 +36,24 @@ class NodesStatus {
     var node = this.getOrCreate(ipfix.domainId);
     node.addMessage(ipfix);
 
+    this.updateParent(ipfix, node);
+    this.updateBattery(ipfix, node);
+    this.updateFlows(ipfix, node);
+  }
+
+  updateFlows(ipfix, node){
+    const values = ipfix.getValues(InfoElem.SOURCE_NODE_ID, InfoElem.DESTINATION_NODE_ID,
+      InfoElem.OCTET_DELTA_COUNT, InfoElem.PACKET_DELTA_COUNT);
+      if(values.length > 0){
+        node.updateStatus("flows", values);
+      }
+  }
+
+  updateParent(ipfix, node){
     this.updateStatus(ipfix, node, InfoElem.PARENT);
+  }
+
+  updateBattery(ipfix, node){
     this.updateStatus(ipfix, node, InfoElem.BATTERY);
   }
 

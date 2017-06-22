@@ -60,34 +60,77 @@
                     </div>
                 </div>
                 <div class="col-md-4">
+                  <div class="panel panel-default">
+                      <div class="panel-heading">
+                          <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Topology status</h3>
+                      </div>
+                          <table class="table table-hover">
+                              <tr>
+                                  <td><strong>Number nodes</strong></td>
+                                  <td id="number_nodes">5</td>
+                              </tr>
+                              <tr>
+                                <td><strong>Maximum depth</strong></td>
+                                <td id="maximum_depth"></td>
+                              </tr>
+                              <tr>
+                                <td><strong>Least battery</strong></td>
+                                <td id="min_battery"></td>
+                              </tr>
+                              <tr>
+                                <td><strong>Total bytes (packets)</strong></td>
+                                <td id="total_bytes"></td>
+                              </tr>
+                          </table>
+                  </div>
                     <div class="panel panel-default">
                         <div class="panel-heading">
-                            <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Selected Node</h3>
+                            <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Node status</h3>
                         </div>
-                        <div class="panel-body">
                             <table class="table table-hover">
+                              <tr>
+                                <th>ID</th>
+                                <td id="currentID">-</td>
+                              </tr>
+                              <tr>
+                                <th>Parent</th>
+                                <td id="parent">-</td>
+                              </tr>
+                              <tr>
+                                <th>Battery</th>
+                                <td id="battery">-</td>
+                              </tr>
+                              <tr>
+                                <th>Last Sent</th>
+                                <td id="lastsent">-</td>
+                              </tr>
+                              <tr>
+                                <th>Total Bytes Sent (packets)</th>
+                                <td id="total_node"></td>
+                              </tr>
+                              <tr>
+                                <th>Total Bytes routed (packets)</th>
+                                <td id="total_node_routed"></td>
+                              </tr>
+                            </table>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><i class="fa fa-bar-chart-o fa-fw"></i> Node flows</h3>
+                        </div>
+                            <table class="table table-hover" id="table_flows">
                                 <tr>
-                                    <th> </th>
-                                    <th>ID</th>
-                                    <th>Parent</th>
-                                    <th>Battery</th>
-                                    <th>Volume</th>
-                                    <th>Last Sent</th>
-                                </tr>
-                                <tr>
-                                    <td></td>
-                                    <td id="currentID">-</td>
-                                    <td id="parent">-</td>
-                                    <td id="battery">-</td>
-                                    <td id="volume">-</td>
-                                    <td id="lastsent">-</td>
+                                    <th>Dst</th>
+                                    <th>Bytes</th>
+                                    <th>Packets</th>
                                 </tr>
                             </table>
-                        </div>
                     </div>
                 </div>
 
             </div>
+
+
         </div>
 
     </div>
